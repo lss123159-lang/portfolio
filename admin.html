@@ -385,6 +385,53 @@
       transform: translateY(0);
     }
 
+    /* 实时预览卡片 */
+    .hero-preview {
+      background: #fafaf8;
+      border: 1px solid var(--admin-border);
+      border-radius: var(--radius);
+      padding: 40px 32px;
+      text-align: center;
+      min-height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-preview-inner {
+      max-width: 480px;
+    }
+
+    .hero-preview-title {
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: #1a1a18;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .hero-preview-name {
+      font-weight: 600;
+    }
+
+    .hero-preview-sub {
+      font-size: 16px;
+      color: #787870;
+      margin-bottom: 20px;
+    }
+
+    .hero-preview-desc {
+      font-size: 14px;
+      color: #b0b0a8;
+      line-height: 1.7;
+    }
+
+    .hero-preview-desc .text-accent {
+      color: #8b8578;
+      font-weight: 500;
+    }
+
     /* 上传区域 */
     .upload-zone {
       border: 2px dashed var(--admin-border);
@@ -672,26 +719,44 @@
     function renderHeroPanel() {
       const hero = config.hero || {};
       const videoEnabled = hero.videoEnabled ? "checked" : "";
+      const defaults = {
+        greeting: "你好，我是",
+        name: "你的名字",
+        tagline: "创造简洁、好用、有温度的数字体验。",
+        description: "专注于<span class=\"text-accent\">产品设计</span>与<span class=\"text-accent\">前端开发</span>",
+      };
       return `
         <div class="panel active">
           <h2 class="panel-title">Hero 区域</h2>
-          <p class="panel-desc">首页第一屏的标题和介绍语。</p>
+          <p class="panel-desc">首页第一屏的标题和介绍语。留空则使用默认值。</p>
           <div class="field">
-            <label class="field-label">问候语</label>
-            <input class="field-input" id="hero-greeting" type="text" value="${esc(hero.greeting || "")}">
+            <label class="field-label">问候语 <span class="field-hint">（默认：${esc(defaults.greeting)}）</span></label>
+            <input class="field-input hero-field" id="hero-greeting" type="text" value="${esc(hero.greeting || "")}" placeholder="${esc(defaults.greeting)}" oninput="updateHeroPreview()">
           </div>
           <div class="field">
-            <label class="field-label">名字</label>
-            <input class="field-input" id="hero-name" type="text" value="${esc(hero.name || "")}">
+            <label class="field-label">名字 <span class="field-hint">（默认：${esc(defaults.name)}）</span></label>
+            <input class="field-input hero-field" id="hero-name" type="text" value="${esc(hero.name || "")}" placeholder="${esc(defaults.name)}" oninput="updateHeroPreview()">
           </div>
           <div class="field">
-            <label class="field-label">副标题（一句话介绍）</label>
-            <input class="field-input" id="hero-tagline" type="text" value="${esc(hero.tagline || "")}">
+            <label class="field-label">副标题 <span class="field-hint">（默认：${esc(defaults.tagline)}）</span></label>
+            <input class="field-input hero-field" id="hero-tagline" type="text" value="${esc(hero.tagline || "")}" placeholder="${esc(defaults.tagline)}" oninput="updateHeroPreview()">
           </div>
           <div class="field">
-            <label class="field-label">详细介绍</label>
-            <textarea class="field-textarea" id="hero-desc" rows="3">${esc(hero.description || "")}</textarea>
+            <label class="field-label">详细介绍 <span class="field-hint">（默认一句话）</span></label>
+            <textarea class="field-textarea hero-field" id="hero-desc" rows="3" placeholder="${esc(defaults.description.replace(/<[^>]*>/g, ''))}" oninput="updateHeroPreview()">${esc(hero.description || "")}</textarea>
             <span class="field-hint">支持 HTML，可使用 &lt;span class="text-accent"&gt;文字&lt;/span&gt; 添加强调色</span>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--admin-border);margin:24px 0;">
+          <!-- 实时预览卡片 -->
+          <div class="field">
+            <label class="field-label">实时预览</label>
+            <div class="hero-preview" id="hero-preview">
+              <div class="hero-preview-inner">
+                <h1 class="hero-preview-title"><span id="pv-greeting">${esc(hero.greeting || defaults.greeting)}</span> <span class="hero-preview-name" id="pv-name">${esc(hero.name || defaults.name)}</span></h1>
+                <p class="hero-preview-sub" id="pv-tagline">${esc(hero.tagline || defaults.tagline)}</p>
+                <p class="hero-preview-desc" id="pv-desc">${hero.description || defaults.description}</p>
+              </div>
+            </div>
           </div>
           <hr style="border:none;border-top:1px solid var(--admin-border);margin:24px 0;">
           <div class="field-row">
@@ -1190,6 +1255,25 @@
       } catch (err) {
         showToast("部署失败: " + err.message, "error");
       }
+    }
+
+    // =============== 实时预览 ===============
+    function updateHeroPreview() {
+      const greeting = document.getElementById("hero-greeting")?.value || "你好，我是";
+      const name = document.getElementById("hero-name")?.value || "你的名字";
+      const tagline = document.getElementById("hero-tagline")?.value || "创造简洁、好用、有温度的数字体验。";
+      const desc = document.getElementById("hero-desc")?.value ||
+        '专注于<span class="text-accent">产品设计</span>与<span class="text-accent">前端开发</span>';
+
+      const pvGreeting = document.getElementById("pv-greeting");
+      const pvName = document.getElementById("pv-name");
+      const pvTagline = document.getElementById("pv-tagline");
+      const pvDesc = document.getElementById("pv-desc");
+
+      if (pvGreeting) pvGreeting.textContent = greeting;
+      if (pvName) pvName.textContent = name;
+      if (pvTagline) pvTagline.textContent = tagline;
+      if (pvDesc) pvDesc.innerHTML = desc;
     }
 
     // 快捷键 Ctrl+S 保存
