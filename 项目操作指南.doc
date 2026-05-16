@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>个人作品集网站 — 完整操作指南</title>
+<style>
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #1a1a18;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  a { color: #5b726c; }
+  strong { color: #1a1a18; }
+</style>
+</head>
+<body>
+<h1 style="font-size:28px;margin:0 0 24px;color:#1a1a18;text-align:center;">个人作品集网站 — 完整操作指南</h1>
+
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<h2 style="font-size:22px;margin:36px 0 14px;color:#1a1a18;border-bottom:1px solid #d0cec8;padding-bottom:8px;">一、项目概览</h2>
+
+<p style="margin:8px 0;line-height:1.8;">这是一个<strong>个人作品集网站</strong>，已经部署在 GitHub Pages 上，任何人都可以通过网址访问。</p>
+
+<table style="border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;"><thead><tr style="background:#f5f4f1;"><th style="border:1px solid #e0ddd8;padding:10px 14px;text-align:left;font-weight:600;">项目信息</th><th style="border:1px solid #e0ddd8;padding:10px 14px;text-align:left;font-weight:600;">详情</th></tr></thead><tbody><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">线上地址</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><strong>https://lss123159-lang.github.io/portfolio/</strong></td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">代码仓库</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><strong>https://github.com/lss123159-lang/portfolio</strong></td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">本地路径</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">C:\Users\12094\Desktop\deepseek project</code></td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">技术栈</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">纯 HTML + CSS + JavaScript，无框架依赖</td></tr></tbody></table>
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<h2 style="font-size:22px;margin:36px 0 14px;color:#1a1a18;border-bottom:1px solid #d0cec8;padding-bottom:8px;">二、系统架构（给以后的我 / Claude 看）</h2>
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">文件结构</h3>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">deepseek project/
+<p style="margin:8px 0;line-height:1.8;">├── index.html          # 主网站页面（开发版，内容从 config.json 动态加载）</p>
+<p style="margin:8px 0;line-height:1.8;">├── admin.html          # 管理面板（在浏览器里改内容、换配色）</p>
+<p style="margin:8px 0;line-height:1.8;">├── config.json         # 核心配置：所有文字内容 + 颜色主题，集中管理</p>
+<p style="margin:8px 0;line-height:1.8;">├── server.js           # 本地开发服务器（Node.js，80行，读写 config.json）</p>
+<p style="margin:8px 0;line-height:1.8;">├── build.js            # 打包脚本：把 config.json 的内容"烤"进静态 HTML</p>
+<p style="margin:8px 0;line-height:1.8;">├── package.json        # 项目配置 + 命令脚本</p>
+<p style="margin:8px 0;line-height:1.8;">├── css/</p>
+<p style="margin:8px 0;line-height:1.8;">│   └── style.css       # 所有样式（CSS 变量驱动配色，响应式适配）</p>
+<p style="margin:8px 0;line-height:1.8;">├── js/</p>
+<p style="margin:8px 0;line-height:1.8;">│   └── main.js         # 前端逻辑（加载配置、渲染页面、滚动动画、导航交互）</p>
+<p style="margin:8px 0;line-height:1.8;">├── images/             # 作品截图等图片资源</p>
+<p style="margin:8px 0;line-height:1.8;">└── docs/               # 【核心】静态打包输出目录，GitHub Pages 直接从这个目录读取</p>
+<p style="margin:8px 0;line-height:1.8;">    └── index.html      # 自包含的静态网站文件（CSS+JS+内容全在一个文件里）</pre></p>
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">数据流</h3>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">[你] → admin.html → server.js → config.json → build.js → docs/index.html → GitHub Pages → [访问者]</pre>
+
+<li style="margin:4px 0;"><strong>你在管理面板改内容</strong> → 数据 POST 到 server.js</li>
+<li style="margin:4px 0;"><strong>server.js 写入 config.json</strong> → 内容持久化保存</li>
+<li style="margin:4px 0;"><strong>运行 npm run build</strong> → build.js 读取 config.json，把所有内容"烤"进 docs/index.html</li>
+<li style="margin:4px 0;"><strong>git push</strong> → docs/ 推上 GitHub</li>
+<li style="margin:4px 0;"><strong>GitHub Pages 自动更新</strong> → 访问者看到新内容</li>
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">设计系统</h3>
+
+<ul style="padding-left:24px;margin:8px 0;"><li style="margin:4px 0;"><strong>配色</strong>：9 个颜色变量（见 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">config.json</code> → <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">theme</code>），CSS 变量驱动，管理面板可视化修改</li>
+<li style="margin:4px 0;"><strong>布局</strong>：单页滚动，5 个板块（Hero / 作品 / 关于 / 联系 / Footer）</li>
+<li style="margin:4px 0;"><strong>排版</strong>：系统字体栈，中文优先 PingFang SC / Microsoft YaHei</li>
+<li style="margin:4px 0;"><strong>响应式</strong>：768px（平板）、480px（手机）两个断点</li>
+<li style="margin:4px 0;"><strong>动画</strong>：Intersection Observer 触发滚动渐入 + 卡片 hover 微交互</li>
+<li style="margin:4px 0;"><strong>导航</strong>：固定顶部，滚动后毛玻璃效果（color-mix + backdrop-filter）</li>
+</ul>
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<h2 style="font-size:22px;margin:36px 0 14px;color:#1a1a18;border-bottom:1px solid #d0cec8;padding-bottom:8px;">三、日常操作（Step by Step）</h2>
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">场景 A：修改网站内容或配色</h3>
+
+<p style="margin:8px 0;line-height:1.8;">> 你需要做的事情：启动本地服务器 → 打开管理面板 → 修改 → 保存 → 打包 → 推送上线</p>
+
+<strong>Step 1：打开终端</strong>
+
+<ul style="padding-left:24px;margin:8px 0;"><li style="margin:4px 0;">按 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">Win + R</code>，输入 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">cmd</code>，回车</li>
+<li style="margin:4px 0;">或者直接在 Windows 搜索栏搜"终端"或"PowerShell"</li>
+</ul>
+<strong>Step 2：进入项目目录</strong>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">cd "C:\Users\12094\Desktop\deepseek project"</pre>
+
+<strong>Step 3：启动本地服务器</strong>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">npm start</pre>
+
+<p style="margin:8px 0;line-height:1.8;">看到以下提示说明启动成功：</p>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">Portfolio 管理后台已启动
+<p style="margin:8px 0;line-height:1.8;">网站:     http://localhost:3000</p>
+<p style="margin:8px 0;line-height:1.8;">管理面板: http://localhost:3000/admin.html</pre></p>
+
+<strong>Step 4：打开管理面板</strong>
+
+<ul style="padding-left:24px;margin:8px 0;"><li style="margin:4px 0;">打开浏览器，地址栏输入 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">http://localhost:3000/admin.html</code></li>
+<li style="margin:4px 0;">左侧有 7 个标签页，分别管理不同区域：</li>
+</ul>  - <strong>配色主题</strong>：9 个颜色选择器，点色块修改，实时生效
+<p style="margin:8px 0;line-height:1.8;">  - <strong>导航设置</strong>：Logo 文字、导航链接（可增删改排序）</p>
+<p style="margin:8px 0;line-height:1.8;">  - <strong>Hero 区</strong>：首页大标题、名字、介绍语</p>
+<p style="margin:8px 0;line-height:1.8;">  - <strong>作品展示</strong>：项目卡片，每个卡片包含标签、标题、描述、图片路径</p>
+<p style="margin:8px 0;line-height:1.8;">  - <strong>关于页面</strong>：技能标签（逗号分隔）、经历时间线</p>
+<p style="margin:8px 0;line-height:1.8;">  - <strong>联系方式</strong>：邮箱、GitHub 等链接</p>
+<p style="margin:8px 0;line-height:1.8;">  - <strong>站点设置</strong>：网页标题、SEO 描述、Footer 文字</p>
+
+<strong>Step 5：修改内容</strong>
+
+<ul style="padding-left:24px;margin:8px 0;"><li style="margin:4px 0;">修改完成后，点页面右上角的 <strong>「保存更改」</strong> 按钮</li>
+<li style="margin:4px 0;">或直接按 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">Ctrl + S</code></li>
+<li style="margin:4px 0;">看到右下角弹出"已保存"提示即成功</li>
+</ul>
+<strong>Step 6：预览效果</strong>
+
+<ul style="padding-left:24px;margin:8px 0;"><li style="margin:4px 0;">新开一个浏览器标签页，访问 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">http://localhost:3000</code></li>
+<li style="margin:4px 0;">查看修改后的效果，不满意就回管理面板继续改</li>
+</ul>
+<strong>Step 7：打包并推送上线</strong>
+
+<p style="margin:8px 0;line-height:1.8;">修改满意后，回到终端，输入：</p>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">npm run deploy</pre>
+
+<p style="margin:8px 0;line-height:1.8;">这一条命令会自动完成三件事：</p>
+<li style="margin:4px 0;">把最新内容打包成静态网站（build.js 读取 config.json → 写入 docs/index.html）</li>
+<li style="margin:4px 0;">Git 提交变更</li>
+<li style="margin:4px 0;">推送到 GitHub</li>
+
+<p style="margin:8px 0;line-height:1.8;">等几秒钟，线上网站 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">https://lss123159-lang.github.io/portfolio/</code> 就会更新。</p>
+
+<strong>Step 8：关闭服务器</strong>
+
+<p style="margin:8px 0;line-height:1.8;">在终端里按 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">Ctrl + C</code> 停止服务器。</p>
+
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">场景 B：添加作品截图</h3>
+
+<li style="margin:4px 0;">把图片文件放到 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">C:\Users\12094\Desktop\deepseek project\images\</code> 目录下</li>
+<li style="margin:4px 0;">按场景 A 的步骤启动服务器，打开管理面板</li>
+<li style="margin:4px 0;">在「作品展示」标签页，找到对应项目卡片的「图片路径」输入框</li>
+<li style="margin:4px 0;">填入 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">images/你的文件名.jpg</code>（例如 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">images/project1.jpg</code>）</li>
+<li style="margin:4px 0;">保存 → <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm run deploy</code></li>
+
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">场景 C：只改小内容，快速上线</h3>
+
+<p style="margin:8px 0;line-height:1.8;">如果你不想打开管理面板（比如只改一个字），可以直接编辑 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">config.json</code>：</p>
+
+<li style="margin:4px 0;">用记事本打开 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">C:\Users\12094\Desktop\deepseek project\config.json</code></li>
+<li style="margin:4px 0;">找到要改的字段，直接修改文字</li>
+<li style="margin:4px 0;">保存文件</li>
+<li style="margin:4px 0;">终端运行 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm run deploy</code></li>
+
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<h2 style="font-size:22px;margin:36px 0 14px;color:#1a1a18;border-bottom:1px solid #d0cec8;padding-bottom:8px;">四、命令速查表</h2>
+
+<table style="border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;"><thead><tr style="background:#f5f4f1;"><th style="border:1px solid #e0ddd8;padding:10px 14px;text-align:left;font-weight:600;">命令</th><th style="border:1px solid #e0ddd8;padding:10px 14px;text-align:left;font-weight:600;">作用</th><th style="border:1px solid #e0ddd8;padding:10px 14px;text-align:left;font-weight:600;">什么时候用</th></tr></thead><tbody><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm start</code></td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">启动本地服务器</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">每次要改内容之前</td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm run build</code></td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">打包静态网站到 docs/</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">只想打包，不推送</td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm run deploy</code></td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">打包 + 推送上线</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">改完内容要发布时</td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">node server.js</code></td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">同上（npm start 的完整写法）</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">npm start 不行时用这个</td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">node build.js</code></td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">同上（npm run build 的完整写法）</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">npm run build 不行时用这个</td></tr></tbody></table>
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<h2 style="font-size:22px;margin:36px 0 14px;color:#1a1a18;border-bottom:1px solid #d0cec8;padding-bottom:8px;">五、GitHub 相关操作</h2>
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">查看仓库状态</h3>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">git status</pre>
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">查看提交历史</h3>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">git log --oneline</pre>
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">如果 deploy 命令因为 git 冲突失败</h3>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">git pull origin master</pre>
+
+<p style="margin:8px 0;line-height:1.8;">然后重新 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm run deploy</code></p>
+
+<h3 style="font-size:18px;margin:28px 0 10px;color:#1a1a18;border-bottom:1px solid #e8e6e0;padding-bottom:6px;">如果想把整个项目搬到另一台电脑</h3>
+
+<pre style="background:#f5f4f1;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;">git clone https://github.com/lss123159-lang/portfolio.git
+<p style="margin:8px 0;line-height:1.8;">cd portfolio</pre></p>
+
+<p style="margin:8px 0;line-height:1.8;">然后就可以在新电脑上用 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm start</code> → 管理面板 → <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm run deploy</code> 的流程了。</p>
+
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<h2 style="font-size:22px;margin:36px 0 14px;color:#1a1a18;border-bottom:1px solid #d0cec8;padding-bottom:8px;">六、故障排查</h2>
+
+<table style="border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;"><thead><tr style="background:#f5f4f1;"><th style="border:1px solid #e0ddd8;padding:10px 14px;text-align:left;font-weight:600;">问题</th><th style="border:1px solid #e0ddd8;padding:10px 14px;text-align:left;font-weight:600;">原因</th><th style="border:1px solid #e0ddd8;padding:10px 14px;text-align:left;font-weight:600;">解决方法</th></tr></thead><tbody><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm start</code> 报错</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">可能端口 3000 被占用</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">换个端口：修改 server.js 第 4 行 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">PORT = 3000</code> 为其他数字，如 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">3001</code></td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">管理面板保存失败</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">server.js 没启动</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">确认终端里 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm start</code> 还在运行</td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;"><code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">npm run deploy</code> 报错</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">网络问题或 GitHub 登录过期</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">终端运行 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">gh auth status</code> 检查登录状态，如果过期：<code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">gh auth login</code></td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">网站打开是空白</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">可能是直接双击了 index.html</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">应该访问 <code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">http://localhost:3000</code>（开发时）或线上地址</td></tr><tr><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">推上去后网站没更新</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">GitHub Pages 需要几十秒刷新</td><td style="border:1px solid #e0ddd8;padding:10px 14px;vertical-align:top;">等 1-2 分钟，或清除浏览器缓存（Ctrl+F5）</td></tr></tbody></table>
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<h2 style="font-size:22px;margin:36px 0 14px;color:#1a1a18;border-bottom:1px solid #d0cec8;padding-bottom:8px;">七、如果以后想找人继续改进</h2>
+
+<p style="margin:8px 0;line-height:1.8;">把这个文档给开发者看，对方一看就明白整个架构。核心要点：</p>
+
+<li style="margin:4px 0;"><strong>内容全在 config.json</strong>，改它就能改网站内容</li>
+<li style="margin:4px 0;"><strong>配色全在 config.json → theme</strong>，9 个字段对应 9 个 CSS 变量</li>
+<li style="margin:4px 0;"><strong>admin.html 是管理面板</strong>，可视化编辑，不需要懂代码</li>
+<li style="margin:4px 0;"><strong>build.js 是打包脚本</strong>，把 config.json 的内容"编译"成纯静态 HTML</li>
+<li style="margin:4px 0;"><strong>docs/ 是部署目录</strong>，GitHub Pages 直接从这个目录读取</li>
+<li style="margin:4px 0;"><strong>线上地址</strong>：<code style="background:#f0eeea;padding:2px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;">https://lss123159-lang.github.io/portfolio/</code></li>
+
+<hr style="border:none;border-top:1px solid #e8e6e0;margin:32px 0;">
+
+<p style="margin:8px 0;line-height:1.8;">> 最后更新：2026 年 5 月 16 日</p>
+<p style="margin:8px 0;line-height:1.8;">> GitHub 用户名：lss123159-lang</p>
+<p style="margin:8px 0;line-height:1.8;">> 注册邮箱：lss123159@gmail.com</p>
+
+</body>
+</html>
