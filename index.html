@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="个人作品集">
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-logo" id="nav-logo">K</a>
+      <ul class="nav-links" id="nav-links"></ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="菜单">
+        <span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="hero-content">
+        <h1 class="hero-title" id="hero-title"></h1>
+        <p class="hero-sub" id="hero-sub"></p>
+        <p class="hero-desc" id="hero-desc"></p>
+      </div>
+      <div class="scroll-hint">
+        <span class="scroll-line"></span>
+      </div>
+    </section>
+
+    <!-- 作品展示 -->
+    <section class="section" id="works">
+      <div class="section-header">
+        <span class="section-tag" id="works-tag"></span>
+        <h2 class="section-title" id="works-title"></h2>
+      </div>
+      <div class="works-grid" id="works-grid"></div>
+    </section>
+
+    <!-- 关于 -->
+    <section class="section" id="about">
+      <div class="section-header">
+        <span class="section-tag" id="about-tag"></span>
+        <h2 class="section-title" id="about-title"></h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-block">
+          <h3 class="about-label">技能</h3>
+          <div class="skill-tags" id="skill-tags"></div>
+        </div>
+        <div class="about-block">
+          <h3 class="about-label">经历</h3>
+          <ul class="timeline" id="timeline"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 联系方式 -->
+    <section class="section" id="contact">
+      <div class="section-header">
+        <span class="section-tag" id="contact-tag"></span>
+        <h2 class="section-title" id="contact-title"></h2>
+      </div>
+      <div class="contact-content">
+        <p class="contact-text" id="contact-text"></p>
+        <div class="contact-links" id="contact-links"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p id="footer-text">&copy; 2026</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

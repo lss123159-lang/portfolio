@@ -1,0 +1,9 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "个人作品集网站",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node build.js"
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "site": {
+    "title": "Portfolio",
+    "description": "个人作品集 - 设计与开发",
+    "footer": "用心构建。"
+  },
+  "theme": {
+    "bg": "#fafaf8",
+    "surface": "#ffffff",
+    "text": "#1a1a18",
+    "textSecondary": "#787870",
+    "textMuted": "#b0b0a8",
+    "border": "#e8e6e0",
+    "borderLight": "#f0eeea",
+    "accent": "#8b8578",
+    "accentSoft": "#f3f1ec"
+  },
+  "nav": {
+    "logo": "K",
+    "links": [
+      { "label": "作品", "href": "#works" },
+      { "label": "关于", "href": "#about" },
+      { "label": "联系", "href": "#contact" }
+    ]
+  },
+  "hero": {
+    "greeting": "你好，我是",
+    "name": "你的名字",
+    "tagline": "创造简洁、好用、有温度的数字体验。",
+    "description": "专注于<span class=\"text-accent\">产品设计</span>与<span class=\"text-accent\">前端开发</span>，<br>相信好的设计应该是\"看起来毫不费力\"的。"
+  },
+  "works": {
+    "tag": "作品",
+    "title": "近期项目",
+    "items": [
+      {
+        "tags": ["Product Design", "Branding"],
+        "title": "项目名称一",
+        "description": "从零到一的产品设计案例，涵盖用户研究、交互原型与视觉设计。",
+        "image": ""
+      },
+      {
+        "tags": ["Frontend", "React"],
+        "title": "项目名称二",
+        "description": "一个注重细节和交互体验的前端实现，追求像素级还原。",
+        "image": ""
+      },
+      {
+        "tags": ["UI/UX", "Design System"],
+        "title": "项目名称三",
+        "description": "一套完整的设计系统，统一品牌语言，提升团队协作效率。",
+        "image": ""
+      },
+      {
+        "tags": ["Full-stack", "TypeScript"],
+        "title": "项目名称四",
+        "description": "全栈应用实践，从数据库设计到前端交互的全流程探索。",
+        "image": ""
+      }
+    ]
+  },
+  "about": {
+    "tag": "关于",
+    "title": "技能与经历",
+    "skills": [
+      "Product Design",
+      "UI/UX",
+      "Figma",
+      "HTML & CSS",
+      "JavaScript",
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Design Systems",
+      "Prototyping"
+    ],
+    "experience": [
+      {
+        "date": "2024 — 至今",
+        "title": "高级产品设计师",
+        "description": "某科技公司 · 负责核心产品线的设计策略与执行"
+      },
+      {
+        "date": "2021 — 2024",
+        "title": "前端开发工程师",
+        "description": "某互联网公司 · 负责 B 端产品的架构与开发"
+      },
+      {
+        "date": "2017 — 2021",
+        "title": "设计专业 · 本科",
+        "description": "某大学 · 数字媒体艺术 / 交互设计方向"
+      }
+    ]
+  },
+  "contact": {
+    "tag": "联系",
+    "title": "保持联系",
+    "text": "如果你对我的作品感兴趣，或者想一起合作，<br>欢迎随时联系我。",
+    "links": [
+      {
+        "label": "yourname@example.com",
+        "href": "mailto:yourname@example.com",
+        "icon": "email"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com",
+        "icon": "github"
+      }
+    ]
+  }
+}
