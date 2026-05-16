@@ -16,7 +16,7 @@
     "accentSoft": "#f3f1ec"
   },
   "nav": {
-    "logo": "K",
+    "logo": "",
     "links": [
       {
         "label": "作品",
@@ -37,8 +37,8 @@
     "name": "",
     "tagline": "",
     "description": "",
-    "video": "",
-    "videoEnabled": false
+    "video": "images/hero-bg.mp4",
+    "videoEnabled": true
   },
   "works": {
     "tag": "作品",
