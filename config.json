@@ -33,12 +33,12 @@
     ]
   },
   "hero": {
-    "greeting": "",
-    "name": "",
-    "tagline": "",
-    "description": "",
-    "video": "",
-    "videoEnabled": false
+    "greeting": "你好，我是",
+    "name": "你的名字",
+    "tagline": "创造简洁、好用、有温度的数字体验。",
+    "description": "专注于<span class=\"text-accent\">产品设计</span>与<span class=\"text-accent\">前端开发</span>，<br>相信好的设计应该是\"看起来毫不费力\"的。",
+    "video": "images/hero-bg.mp4",
+    "videoEnabled": true
   },
   "works": {
     "tag": "作品",
