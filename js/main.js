@@ -93,11 +93,16 @@ function renderHero(hero) {
   const subEl = document.getElementById("hero-sub");
   const descEl = document.getElementById("hero-desc");
 
+  const greeting = hero.greeting || "你好，我是";
+  const name = hero.name || "你的名字";
+  const tagline = hero.tagline || "创造简洁、好用、有温度的数字体验。";
+  const desc = hero.description || '专注于<span class="text-accent">产品设计</span>与<span class="text-accent">前端开发</span>';
+
   if (titleEl) {
-    titleEl.innerHTML = `${escHtml(hero.greeting || "")} <span class="hero-name">${escHtml(hero.name || "")}</span>`;
+    titleEl.innerHTML = `${escHtml(greeting)} <span class="hero-name">${escHtml(name)}</span>`;
   }
-  if (subEl) subEl.textContent = hero.tagline || "";
-  if (descEl) descEl.innerHTML = hero.description || "";
+  if (subEl) subEl.textContent = tagline;
+  if (descEl) descEl.innerHTML = desc;
 
   // 视频背景
   const video = document.getElementById("hero-video");

@@ -473,6 +473,7 @@
       <button class="btn" onclick="revertConfig()">撤回修改</button>
       <button class="btn" onclick="previewSite()">预览网站</button>
       <button class="btn btn-primary" onclick="saveConfig()">保存更改</button>
+      <button class="btn btn-primary" onclick="deploySite()" style="background:#5b726c;border-color:#5b726c;">部署上线</button>
     </div>
   </div>
 
@@ -1126,6 +1127,9 @@
               bar.style.width = "100%";
               if (videoPathInput) videoPathInput.value = result.path;
               config.hero.video = result.path;
+              config.hero.videoEnabled = true;
+              const checkbox = document.getElementById("hero-video-enabled");
+              if (checkbox) checkbox.checked = true;
               setTimeout(() => {
                 progress.style.display = "none";
                 bar.style.width = "0%";
@@ -1166,6 +1170,25 @@
         showToast("已恢复到上次保存的状态", "saved");
       } catch (err) {
         showToast("撤回失败: " + err.message, "error");
+      }
+    }
+
+    // =============== 部署上线 ===============
+    async function deploySite() {
+      collectFormData();
+      await saveConfig();
+      showToast("正在构建并部署...");
+
+      try {
+        const res = await fetch("/api/deploy", { method: "POST" });
+        const result = await res.json();
+        if (result.ok) {
+          showToast("已部署上线，稍后刷新线上网站即可看到", "saved");
+        } else {
+          showToast("部署失败: " + result.message, "error");
+        }
+      } catch (err) {
+        showToast("部署失败: " + err.message, "error");
       }
     }
 

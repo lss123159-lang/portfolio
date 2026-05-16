@@ -124,6 +124,39 @@ function handleAPI(req, res) {
     return true;
   }
 
+  // POST /api/deploy — 构建并推送到 GitHub
+  if (req.method === "POST" && url.pathname === "/api/deploy") {
+    try {
+      const { execSync } = require("child_process");
+      const cwd = __dirname;
+      let output = "";
+
+      output += "构建... ";
+      execSync("node build.js", { cwd, encoding: "utf-8" });
+      output += "完成\n";
+
+      output += "提交... ";
+      execSync('git add -A', { cwd, encoding: "utf-8" });
+      execSync('git commit -m "deploy: 从管理面板部署"', { cwd, encoding: "utf-8" });
+      output += "完成\n";
+
+      output += "推送... ";
+      execSync("git push", { cwd, encoding: "utf-8" });
+      output += "完成\n";
+
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ ok: true, message: output }));
+    } catch (err) {
+      // git commit 如果没有变更会报错，忽略
+      const msg = err.message.includes("nothing to commit") ? "没有新变更需要部署" : err.message;
+      res.writeHead(err.message.includes("nothing to commit") ? 200 : 500, {
+        "Content-Type": "application/json; charset=utf-8",
+      });
+      res.end(JSON.stringify({ ok: true, message: msg }));
+    }
+    return true;
+  }
+
   return false;
 }
 
