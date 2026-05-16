@@ -77,6 +77,30 @@ function handleAPI(req, res) {
     return true;
   }
 
+  // POST /api/upload — 上传文件到 images/
+  if (req.method === "POST" && url.pathname === "/api/upload") {
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", () => {
+      try {
+        const { name, data } = JSON.parse(body);
+        // data 格式: data:video/mp4;base64,AAAA...
+        const match = data.match(/^data:.+;base64,(.+)$/);
+        if (!match) throw new Error("无效的文件数据");
+        const ext = name.includes(".") ? name.split(".").pop() : "mp4";
+        const safeName = "hero-bg." + ext;
+        const buf = Buffer.from(match[1], "base64");
+        fs.writeFileSync(path.join(__dirname, "images", safeName), buf);
+        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ ok: true, path: "images/" + safeName }));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    });
+    return true;
+  }
+
   return false;
 }
 
