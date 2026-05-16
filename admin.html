@@ -470,7 +470,8 @@
     <span class="topbar-title">Portfolio 管理面板</span>
     <div class="topbar-actions">
       <span class="status" id="status"></span>
-      <button class="btn" onclick="window.open('/', '_blank')">预览网站</button>
+      <button class="btn" onclick="revertConfig()">撤回修改</button>
+      <button class="btn" onclick="previewSite()">预览网站</button>
       <button class="btn btn-primary" onclick="saveConfig()">保存更改</button>
     </div>
   </div>
@@ -1109,21 +1110,18 @@
         progress.style.display = "block";
         bar.style.width = "0%";
 
-        const reader = new FileReader();
-        reader.onprogress = (e) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
-            bar.style.width = Math.round((e.loaded / e.total) * 80) + "%";
+            bar.style.width = Math.round((e.loaded / e.total) * 90) + "%";
           }
         };
-        reader.onload = async () => {
-          bar.style.width = "90%";
+        xhr.onload = () => {
           try {
-            const res = await fetch("/api/upload", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ name: file.name, data: reader.result }),
-            });
-            const result = await res.json();
+            const result = JSON.parse(xhr.responseText);
             if (result.ok) {
               bar.style.width = "100%";
               if (videoPathInput) videoPathInput.value = result.path;
@@ -1142,7 +1140,32 @@
             progress.style.display = "none";
           }
         };
-        reader.readAsDataURL(file);
+        xhr.onerror = () => {
+          showToast("上传失败: 网络错误", "error");
+          progress.style.display = "none";
+        };
+        xhr.open("POST", "/api/upload");
+        xhr.send(formData);
+      }
+    }
+
+    // =============== 预览 ===============
+    async function previewSite() {
+      collectFormData();
+      await saveConfig();
+      window.open("/", "_blank");
+    }
+
+    // =============== 撤回 ===============
+    async function revertConfig() {
+      if (!confirm("确定要撤回所有未保存的修改？将恢复到上次保存的状态。")) return;
+      try {
+        const res = await fetch("/api/config");
+        config = await res.json();
+        renderPanel();
+        showToast("已恢复到上次保存的状态", "saved");
+      } catch (err) {
+        showToast("撤回失败: " + err.message, "error");
       }
     }
 

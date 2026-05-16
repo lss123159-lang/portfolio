@@ -79,18 +79,41 @@ function handleAPI(req, res) {
 
   // POST /api/upload — 上传文件到 images/
   if (req.method === "POST" && url.pathname === "/api/upload") {
-    let body = "";
-    req.on("data", (chunk) => (body += chunk));
+    const chunks = [];
+    req.on("data", (chunk) => chunks.push(chunk));
     req.on("end", () => {
       try {
-        const { name, data } = JSON.parse(body);
-        // data 格式: data:video/mp4;base64,AAAA...
-        const match = data.match(/^data:.+;base64,(.+)$/);
-        if (!match) throw new Error("无效的文件数据");
-        const ext = name.includes(".") ? name.split(".").pop() : "mp4";
+        const buf = Buffer.concat(chunks);
+        const contentType = req.headers["content-type"] || "";
+        const bm = contentType.match(/boundary=(.+)$/);
+        if (!bm) throw new Error("无法解析上传数据");
+
+        const boundary = bm[1].trim();
+        const bStart = Buffer.from("--" + boundary + "\r\n");
+        const bEnd = Buffer.from("\r\n--" + boundary + "--");
+
+        // 找到起始边界后的头部结束位置 (\r\n\r\n)
+        const headStart = buf.indexOf(bStart);
+        if (headStart === -1) throw new Error("找不到起始边界");
+        const bodyStart = headStart + bStart.length;
+        const headerEnd = buf.indexOf(Buffer.from("\r\n\r\n"), bodyStart);
+        if (headerEnd === -1) throw new Error("找不到文件头结束");
+        const fileStart = headerEnd + 4;
+
+        // 找到结束边界
+        const fileEnd = buf.indexOf(bEnd, fileStart);
+        if (fileEnd === -1) throw new Error("找不到结束边界");
+
+        // 提取文件名
+        const header = buf.slice(bodyStart, headerEnd).toString();
+        const nm = header.match(/filename="(.+?)"/);
+        const fileName = nm ? nm[1] : "video.mp4";
+
+        const ext = fileName.includes(".") ? fileName.split(".").pop() : "mp4";
         const safeName = "hero-bg." + ext;
-        const buf = Buffer.from(match[1], "base64");
-        fs.writeFileSync(path.join(__dirname, "images", safeName), buf);
+        const fileBuf = buf.slice(fileStart, fileEnd);
+
+        fs.writeFileSync(path.join(__dirname, "images", safeName), fileBuf);
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({ ok: true, path: "images/" + safeName }));
       } catch (err) {
