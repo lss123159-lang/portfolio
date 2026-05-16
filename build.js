@@ -76,7 +76,7 @@ function renderNav() {
 function renderHero() {
   const videoHTML = hero.videoEnabled && hero.video
     ? `<div class="hero-video-wrap">
-        <video class="hero-video" autoplay muted loop playsinline preload="metadata" src="${esc(hero.video)}"></video>
+        <video class="hero-video" autoplay muted loop playsinline preload="metadata" src="${esc(hero.video)}" poster="${esc(hero.video.replace(/\/[^/]+$/, '/poster.jpg'))}"></video>
         <div class="hero-overlay"></div>
       </div>`
     : "";

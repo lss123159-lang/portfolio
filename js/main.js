@@ -110,6 +110,9 @@ function renderHero(hero) {
   if (video && videoWrap) {
     if (hero.videoEnabled && hero.video) {
       video.src = hero.video;
+      // poster 和视频同目录，名为 poster.jpg
+      const posterPath = hero.video.replace(/\/[^/]+$/, "/poster.jpg");
+      video.setAttribute("poster", posterPath);
       videoWrap.style.display = "block";
     } else {
       videoWrap.style.display = "none";

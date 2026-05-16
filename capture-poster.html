@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>视频封面截取</title>
+<style>
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; background: #f5f4f1; margin: 0; padding: 40px;
+  }
+  h2 { font-size: 20px; margin-bottom: 8px; color: #1a1a18; }
+  p { color: #787870; margin-bottom: 24px; font-size: 14px; }
+  video { max-width: 600px; border-radius: 12px; margin-bottom: 20px; display: none; }
+  canvas { display: none; }
+  .btn {
+    padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; background: #1a1a18; color: #fff;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .btn:hover { background: #333; }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .status { margin-top: 16px; font-size: 13px; color: #787870; }
+  img { max-width: 600px; border-radius: 12px; margin-top: 20px; display: none; }
+  .info { text-align: center; max-width: 500px; }
+  .step { background: #fff; border-radius: 10px; padding: 20px; margin-top: 24px; text-align: left; width: 100%; max-width: 500px; }
+  .step h3 { font-size: 15px; margin-bottom: 8px; }
+  .step p { font-size: 13px; margin-bottom: 4px; color: #666; }
+</style>
+</head>
+<body>
+  <div class="info">
+    <h2>截取视频封面图</h2>
+    <p>从瑞士山景视频中截取一帧，用作网站加载时的占位图</p>
+  </div>
+
+  <input type="file" id="fileInput" accept="video/*" style="display:none;">
+  <button class="btn" id="selectBtn">选择视频文件</button>
+  <p class="status" id="status"></p>
+
+  <video id="video" muted preload="auto"></video>
+  <canvas id="canvas"></canvas>
+  <img id="preview" crossorigin="anonymous">
+
+  <div class="step">
+    <h3>操作步骤</h3>
+    <p>1. 点「选择视频文件」→ 选择 images/hero-bg.mp4</p>
+    <p>2. 点「截取封面」→ 自动下载 poster.jpg</p>
+    <p>3. 把 poster.jpg 放到 images/ 文件夹里</p>
+  </div>
+
+  <script>
+    const selectBtn = document.getElementById("selectBtn");
+    const fileInput = document.getElementById("fileInput");
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const preview = document.getElementById("preview");
+    const status = document.getElementById("status");
+
+    let posterDownloaded = false;
+
+    selectBtn.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      video.src = url;
+      video.style.display = "block";
+      status.textContent = "视频已加载，正在定位到 2 秒处...";
+      selectBtn.textContent = "截取封面";
+      selectBtn.onclick = captureFrame;
+
+      video.onloadeddata = () => {
+        video.currentTime = 2;
+      };
+
+      video.onseeked = () => {
+        if (posterDownloaded) return;
+        status.textContent = "就绪，点击「截取封面」按钮";
+      };
+    });
+
+    function captureFrame() {
+      if (video.readyState < 2) {
+        status.textContent = "视频还没准备好，请稍等...";
+        return;
+      }
+
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // 预览
+      preview.src = canvas.toDataURL("image/jpeg", 0.85);
+      preview.style.display = "block";
+
+      // 下载
+      canvas.toBlob((blob) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "poster.jpg";
+        a.click();
+        posterDownloaded = true;
+        status.textContent = "poster.jpg 已下载！请把它放到项目的 images/ 文件夹里";
+        selectBtn.textContent = "重新截取";
+        selectBtn.onclick = captureFrame;
+      }, "image/jpeg", 0.85);
+    }
+  </script>
+</body>
+</html>
