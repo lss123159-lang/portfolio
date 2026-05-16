@@ -4,6 +4,7 @@
   "description": "个人作品集网站",
   "scripts": {
     "start": "node server.js",
-    "build": "node build.js"
+    "build": "node build.js",
+    "deploy": "node build.js && git add -A && git commit -m \"更新内容\" && git push"
   }
 }
