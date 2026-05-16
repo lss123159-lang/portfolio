@@ -621,6 +621,7 @@
     // =============== Hero 面板 ===============
     function renderHeroPanel() {
       const hero = config.hero || {};
+      const videoEnabled = hero.videoEnabled ? "checked" : "";
       return `
         <div class="panel active">
           <h2 class="panel-title">Hero 区域</h2>
@@ -641,6 +642,20 @@
             <label class="field-label">详细介绍</label>
             <textarea class="field-textarea" id="hero-desc" rows="3">${esc(hero.description || "")}</textarea>
             <span class="field-hint">支持 HTML，可使用 &lt;span class="text-accent"&gt;文字&lt;/span&gt; 添加强调色</span>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--admin-border);margin:24px 0;">
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label">
+                <input type="checkbox" id="hero-video-enabled" ${videoEnabled} style="margin-right:6px;">
+                开启视频背景
+              </label>
+            </div>
+            <div class="field">
+              <label class="field-label">视频文件路径</label>
+              <input class="field-input" id="hero-video" type="text" value="${esc(hero.video || "")}" placeholder="如：images/hero-bg.mp4">
+              <span class="field-hint">留空则关闭视频背景。视频会自动静音循环播放。</span>
+            </div>
           </div>
         </div>`;
     }
@@ -872,6 +887,8 @@
           config.hero.name = document.getElementById("hero-name")?.value || "";
           config.hero.tagline = document.getElementById("hero-tagline")?.value || "";
           config.hero.description = document.getElementById("hero-desc")?.value || "";
+          config.hero.videoEnabled = document.getElementById("hero-video-enabled")?.checked || false;
+          config.hero.video = document.getElementById("hero-video")?.value || "";
           break;
         case "works":
           config.works.tag = document.getElementById("works-tag")?.value || "";

@@ -74,8 +74,15 @@ function renderNav() {
 }
 
 function renderHero() {
+  const videoHTML = hero.videoEnabled && hero.video
+    ? `<div class="hero-video-wrap">
+        <video class="hero-video" autoplay muted loop playsinline preload="metadata" src="${esc(hero.video)}"></video>
+        <div class="hero-overlay"></div>
+      </div>`
+    : "";
   return `
   <section class="hero" id="hero">
+    ${videoHTML}
     <div class="hero-content">
       <h1 class="hero-title">${esc(hero.greeting || "")} <span class="hero-name">${esc(hero.name || "")}</span></h1>
       <p class="hero-sub">${esc(hero.tagline || "")}</p>

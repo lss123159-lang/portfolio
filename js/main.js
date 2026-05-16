@@ -98,6 +98,18 @@ function renderHero(hero) {
   }
   if (subEl) subEl.textContent = hero.tagline || "";
   if (descEl) descEl.innerHTML = hero.description || "";
+
+  // 视频背景
+  const video = document.getElementById("hero-video");
+  const videoWrap = document.getElementById("hero-video-wrap");
+  if (video && videoWrap) {
+    if (hero.videoEnabled && hero.video) {
+      video.src = hero.video;
+      videoWrap.style.display = "block";
+    } else {
+      videoWrap.style.display = "none";
+    }
+  }
 }
 
 function renderWorks(works) {
