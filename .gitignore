@@ -2,5 +2,4 @@ node_modules/
 .claude/
 .DS_Store
 Thumbs.db
-.gitignore 临时文件
 ~$*
