@@ -37,8 +37,8 @@
     "name": "",
     "tagline": "",
     "description": "",
-    "video": "images/hero-bg.mp4",
-    "videoEnabled": true
+    "video": "",
+    "videoEnabled": false
   },
   "works": {
     "tag": "作品",

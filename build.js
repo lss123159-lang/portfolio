@@ -74,6 +74,10 @@ function renderNav() {
 }
 
 function renderHero() {
+  const greeting = hero.greeting || "你好，我是";
+  const name = hero.name || "你的名字";
+  const tagline = hero.tagline || "创造简洁、好用、有温度的数字体验。";
+  const desc = hero.description || '专注于<span class="text-accent">产品设计</span>与<span class="text-accent">前端开发</span>';
   const videoHTML = hero.videoEnabled && hero.video
     ? `<div class="hero-video-wrap">
         <video class="hero-video" autoplay muted loop playsinline preload="metadata" src="${esc(hero.video)}" poster="${esc(hero.video.replace(/\/[^/]+$/, '/poster.jpg'))}"></video>
@@ -84,9 +88,9 @@ function renderHero() {
   <section class="hero" id="hero">
     ${videoHTML}
     <div class="hero-content">
-      <h1 class="hero-title">${esc(hero.greeting || "")} <span class="hero-name">${esc(hero.name || "")}</span></h1>
-      <p class="hero-sub">${esc(hero.tagline || "")}</p>
-      <p class="hero-desc">${hero.description || ""}</p>
+      <h1 class="hero-title">${esc(greeting)} <span class="hero-name">${esc(name)}</span></h1>
+      <p class="hero-sub">${esc(tagline)}</p>
+      <p class="hero-desc">${desc}</p>
     </div>
     <div class="scroll-hint"><span class="scroll-line"></span></div>
   </section>`;
