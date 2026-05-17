@@ -175,6 +175,38 @@
       letter-spacing: 0.02em;
     }
 
+    .field-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ccc;
+      margin-right: 4px;
+      vertical-align: middle;
+      transition: background 0.2s;
+    }
+
+    .field-dot.customized {
+      background: #5b8;
+      box-shadow: 0 0 4px rgba(85, 187, 136, 0.4);
+    }
+
+    .field-reset {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      color: #bbb;
+      margin-left: 6px;
+      padding: 0 4px;
+      transition: color 0.2s;
+      font-family: inherit;
+    }
+
+    .field-reset:hover {
+      color: var(--admin-danger);
+    }
+
     .field-input,
     .field-textarea {
       width: 100%;
@@ -545,6 +577,7 @@
 
   <script>
     let config = {};
+    let defaults = {};
     let adminLang = "zh"; // 管理面板当前编辑的语言
 
     // 双语辅助：返回当前语言对应的 key
@@ -552,10 +585,38 @@
       return adminLang === "en" ? baseKey + "_en" : baseKey;
     }
 
-    // 获取对象的双语值
+    // 获取对象的双语值（合并 config + defaults）
     function lv(obj, baseKey, fallback) {
       const key = adminLang === "en" ? baseKey + "_en" : baseKey;
-      return obj[key] || "";
+      if (config[obj] && config[obj][key] !== undefined && config[obj][key] !== "") return config[obj][key];
+      if (defaults[obj] && defaults[obj][key] !== undefined) return defaults[obj][key];
+      return fallback || "";
+    }
+
+    // 获取值来源：返回 'config' | 'defaults'
+    function valSource(obj, baseKey) {
+      const key = adminLang === "en" ? baseKey + "_en" : baseKey;
+      if (config[obj] && config[obj][key] !== undefined && config[obj][key] !== "") return "config";
+      return "defaults";
+    }
+
+    // 生成字段标签：带状态圆点
+    function fieldLabel(text, obj, baseKey) {
+      const src = valSource(obj, baseKey);
+      const dot = src === "config"
+        ? '<span class="field-dot customized" title="已自定义"></span>'
+        : '<span class="field-dot" title="使用默认值"></span>';
+      return `<label class="field-label">${dot} ${text}</label>`;
+    }
+
+    // 重置单个字段为默认值
+    function resetField(obj, baseKey) {
+      const keys = [baseKey, baseKey + "_en"];
+      keys.forEach(k => {
+        if (config[obj]) config[obj][k] = "";
+      });
+      renderPanel();
+      showToast("已重置为默认值", "saved");
     }
 
     // 切换编辑语言
@@ -570,8 +631,12 @@
     // 加载配置
     async function loadConfig() {
       try {
-        const res = await fetch("/api/config");
-        config = await res.json();
+        const [resDef, resCfg] = await Promise.all([
+          fetch("/api/defaults"),
+          fetch("/api/config"),
+        ]);
+        defaults = await resDef.json();
+        config = await resCfg.json();
         renderAll();
       } catch (err) {
         showToast("无法加载配置，请确认服务器已启动", "error");
@@ -752,20 +817,20 @@
           <h2 class="panel-title">Hero 区域 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
           <p class="panel-desc">首页第一屏的标题和介绍语。留空则使用默认值。点顶部「中/EN」按钮切换编辑语言。</p>
           <div class="field">
-            <label class="field-label">问候语 <span class="field-hint">（默认：${esc(defaults.greeting)}）</span></label>
-            <input class="field-input hero-field" id="hero-greeting" type="text" value="${esc(lv(hero, 'greeting'))}" placeholder="${esc(defaults.greeting)}" oninput="updateHeroPreview()">
+            ${fieldLabel('问候语', 'hero', 'greeting')}
+            <input class="field-input hero-field" id="hero-greeting" type="text" value="${esc(lv('hero', 'greeting'))}" placeholder="${esc(defaults.hero.greeting)}" oninput="updateHeroPreview()">
           </div>
           <div class="field">
-            <label class="field-label">名字 <span class="field-hint">（默认：${esc(defaults.name)}）</span></label>
-            <input class="field-input hero-field" id="hero-name" type="text" value="${esc(lv(hero, 'name'))}" placeholder="${esc(defaults.name)}" oninput="updateHeroPreview()">
+            ${fieldLabel('名字', 'hero', 'name')}
+            <input class="field-input hero-field" id="hero-name" type="text" value="${esc(lv('hero', 'name'))}" placeholder="${esc(defaults.hero.name)}" oninput="updateHeroPreview()">
           </div>
           <div class="field">
-            <label class="field-label">副标题 <span class="field-hint">（默认：${esc(defaults.tagline)}）</span></label>
-            <input class="field-input hero-field" id="hero-tagline" type="text" value="${esc(lv(hero, 'tagline'))}" placeholder="${esc(defaults.tagline)}" oninput="updateHeroPreview()">
+            ${fieldLabel('副标题', 'hero', 'tagline')}
+            <input class="field-input hero-field" id="hero-tagline" type="text" value="${esc(lv('hero', 'tagline'))}" placeholder="${esc(defaults.hero.tagline)}" oninput="updateHeroPreview()">
           </div>
           <div class="field">
-            <label class="field-label">详细介绍 <span class="field-hint">（默认一句话）</span></label>
-            <textarea class="field-textarea hero-field" id="hero-desc" rows="3" placeholder="${esc(defaults.description.replace(/<[^>]*>/g, ''))}" oninput="updateHeroPreview()">${esc(lv(hero, 'description'))}</textarea>
+            ${fieldLabel('详细介绍', 'hero', 'description')}
+            <textarea class="field-textarea hero-field" id="hero-desc" rows="3" placeholder="${esc(defaults.hero.description.replace(/<[^>]*>/g, ''))}" oninput="updateHeroPreview()">${esc(lv('hero', 'description'))}</textarea>
             <span class="field-hint">支持 HTML，可使用 &lt;span class="text-accent"&gt;文字&lt;/span&gt; 添加强调色</span>
           </div>
           <hr style="border:none;border-top:1px solid var(--admin-border);margin:24px 0;">
@@ -774,9 +839,9 @@
             <label class="field-label">实时预览</label>
             <div class="hero-preview" id="hero-preview">
               <div class="hero-preview-inner">
-                <h1 class="hero-preview-title"><span id="pv-greeting">${esc(lv(hero, 'greeting') || defaults.greeting)}</span> <span class="hero-preview-name" id="pv-name">${esc(lv(hero, 'name') || defaults.name)}</span></h1>
-                <p class="hero-preview-sub" id="pv-tagline">${esc(lv(hero, 'tagline') || defaults.tagline)}</p>
-                <p class="hero-preview-desc" id="pv-desc">${lv(hero, 'description') || defaults.description}</p>
+                <h1 class="hero-preview-title"><span id="pv-greeting">${esc(lv('hero', 'greeting') || defaults.hero.greeting)}</span> <span class="hero-preview-name" id="pv-name">${esc(lv('hero', 'name') || defaults.hero.name)}</span></h1>
+                <p class="hero-preview-sub" id="pv-tagline">${esc(lv('hero', 'tagline') || defaults.hero.tagline)}</p>
+                <p class="hero-preview-desc" id="pv-desc">${lv('hero', 'description') || defaults.hero.description}</p>
               </div>
             </div>
           </div>
@@ -1043,6 +1108,11 @@
           config.hero[lk("description")] = document.getElementById("hero-desc")?.value || "";
           config.hero.videoEnabled = document.getElementById("hero-video-enabled")?.checked || false;
           config.hero.video = document.getElementById("hero-video")?.value || "";
+          // 清除空字符串，保持 config.json 干净
+          for (const k of ["greeting", "greeting_en", "name", "name_en", "tagline", "tagline_en", "description", "description_en", "video"]) {
+            if (config.hero[k] === "") delete config.hero[k];
+          }
+          if (!config.hero.videoEnabled) delete config.hero.videoEnabled;
           break;
         case "works":
           config.works.tag = document.getElementById("works-tag")?.value || "";

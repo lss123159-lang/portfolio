@@ -47,6 +47,19 @@ function serveFile(res, filePath) {
 function handleAPI(req, res) {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
+  // GET /api/defaults
+  if (req.method === "GET" && url.pathname === "/api/defaults") {
+    try {
+      const raw = fs.readFileSync(path.join(__dirname, "defaults.json"), "utf-8");
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(raw);
+    } catch {
+      res.writeHead(500);
+      res.end('{"error":"无法读取默认值"}');
+    }
+    return true;
+  }
+
   // GET /api/config
   if (req.method === "GET" && url.pathname === "/api/config") {
     const config = readConfig();

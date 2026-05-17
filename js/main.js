@@ -2,7 +2,33 @@
  * 全局状态
  */
 let config = null;
+let defaults = null;
 let currentLang = "zh";
+
+/**
+ * 深合并：config 覆盖 defaults
+ */
+function deepMerge(def, cfg) {
+  if (!cfg || typeof cfg !== "object") return def;
+  if (!def || typeof def !== "object") return cfg;
+  if (Array.isArray(def) && Array.isArray(cfg)) {
+    // 数组按索引逐个合并
+    return cfg.map((item, i) => deepMerge(def[i] || {}, item));
+  }
+  const result = {};
+  for (const key of Object.keys(def)) {
+    if (cfg[key] !== undefined && cfg[key] !== "" && cfg[key] !== null) {
+      result[key] = deepMerge(def[key], cfg[key]);
+    } else {
+      result[key] = def[key];
+    }
+  }
+  // 保留 config 中有而 defaults 中没有的字段
+  for (const key of Object.keys(cfg)) {
+    if (!(key in def)) result[key] = cfg[key];
+  }
+  return result;
+}
 
 /**
  * 双语文本辅助：obj[key] 是中文，obj[key_en] 是英文
@@ -18,8 +44,13 @@ function t(obj, key, fallback) {
  */
 async function init() {
   try {
-    const res = await fetch("/api/config");
-    config = await res.json();
+    const [resDef, resCfg] = await Promise.all([
+      fetch("/api/defaults"),
+      fetch("/api/config"),
+    ]);
+    defaults = await resDef.json();
+    const userCfg = await resCfg.json();
+    config = deepMerge(defaults, userCfg);
 
     // 从 localStorage 恢复语言偏好
     const saved = localStorage.getItem("lang");

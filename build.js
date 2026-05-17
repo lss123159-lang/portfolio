@@ -12,9 +12,32 @@ const ROOT = __dirname;
 const DIST = path.join(ROOT, "docs");
 
 // 读取配置
-const config = JSON.parse(fs.readFileSync(path.join(ROOT, "config.json"), "utf-8"));
+const defaults = JSON.parse(fs.readFileSync(path.join(ROOT, "defaults.json"), "utf-8"));
+const userConfig = JSON.parse(fs.readFileSync(path.join(ROOT, "config.json"), "utf-8"));
 const css = fs.readFileSync(path.join(ROOT, "css", "style.css"), "utf-8");
 
+// 深合并
+function deepMerge(def, cfg) {
+  if (!cfg || typeof cfg !== "object") return def;
+  if (!def || typeof def !== "object") return cfg;
+  if (Array.isArray(def) && Array.isArray(cfg)) {
+    return cfg.map((item, i) => deepMerge(def[i] || {}, item));
+  }
+  const result = {};
+  for (const key of Object.keys(def)) {
+    if (cfg[key] !== undefined && cfg[key] !== "" && cfg[key] !== null) {
+      result[key] = deepMerge(def[key], cfg[key]);
+    } else {
+      result[key] = def[key];
+    }
+  }
+  for (const key of Object.keys(cfg)) {
+    if (!(key in def)) result[key] = cfg[key];
+  }
+  return result;
+}
+
+const config = deepMerge(defaults, userConfig);
 const { theme, site, nav, hero, works, about, contact } = config;
 
 // ========== 工具函数 ==========
