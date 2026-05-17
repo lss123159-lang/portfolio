@@ -819,14 +819,7 @@
 
     // =============== Hero 面板 ===============
     function renderHeroPanel() {
-      const hero = config.hero || {};
-      const videoEnabled = hero.videoEnabled ? "checked" : "";
-      const defaults = {
-        greeting: "你好，我是",
-        name: "你的名字",
-        tagline: "创造简洁、好用、有温度的数字体验。",
-        description: "专注于<span class=\"text-accent\">产品设计</span>与<span class=\"text-accent\">前端开发</span>",
-      };
+      const videoEnabled = lv('hero', 'videoEnabled') ? "checked" : "";
       return `
         <div class="panel active">
           <h2 class="panel-title">Hero 区域 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
@@ -870,7 +863,7 @@
             </div>
             <div class="field">
               <label class="field-label">视频文件路径</label>
-              <input class="field-input" id="hero-video" type="text" value="${esc(hero.video || "")}" placeholder="如：images/hero-bg.mp4">
+              <input class="field-input" id="hero-video" type="text" value="${esc(lv('hero', 'video'))}" placeholder="如：images/hero-bg.mp4">
               <span class="field-hint">留空则关闭视频背景。视频会自动静音循环播放。</span>
             </div>
           </div>
@@ -1336,7 +1329,10 @@
     async function previewSite() {
       collectFormData();
       await saveConfig();
-      window.open("/", "_blank");
+      const w = window.open("/", "_blank");
+      if (!w) {
+        showToast("弹窗被拦截，请允许本站弹窗或手动打开 http://localhost:3000", "error");
+      }
     }
 
     // =============== 撤回 ===============
