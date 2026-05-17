@@ -22,20 +22,32 @@
     "logo": "K",
     "logo_en": "K",
     "links": [
-      { "label": "作品", "label_en": "Works", "href": "#works" },
-      { "label": "关于", "label_en": "About", "href": "#about" },
-      { "label": "联系", "label_en": "Contact", "href": "#contact" }
+      {
+        "label": "作品",
+        "label_en": "Works",
+        "href": "#works"
+      },
+      {
+        "label": "关于",
+        "label_en": "About",
+        "href": "#about"
+      },
+      {
+        "label": "联系",
+        "label_en": "Contact",
+        "href": "#contact"
+      }
     ]
   },
   "hero": {
-    "greeting": "你好，我是",
-    "greeting_en": "Hi, I'm",
-    "name": "你的名字",
-    "name_en": "Your Name",
-    "tagline": "创造简洁、好用、有温度的数字体验。",
-    "tagline_en": "Creating clean, usable, and warm digital experiences.",
-    "description": "专注于<span class=\"text-accent\">产品设计</span>与<span class=\"text-accent\">前端开发</span>，<br>相信好的设计应该是\"看起来毫不费力\"的。",
-    "description_en": "Focused on <span class=\"text-accent\">product design</span> & <span class=\"text-accent\">frontend development</span>,<br>believing good design should feel effortless.",
+    "greeting": "",
+    "greeting_en": "",
+    "name": "",
+    "name_en": "",
+    "tagline": "",
+    "tagline_en": "",
+    "description": "",
+    "description_en": "",
     "video": "images/hero-bg.mp4",
     "videoEnabled": true
   },
@@ -46,7 +58,10 @@
     "title_en": "Recent Projects",
     "items": [
       {
-        "tags": ["Product Design", "Branding"],
+        "tags": [
+          "Product Design",
+          "Branding"
+        ],
         "title": "项目名称一",
         "title_en": "Project Alpha",
         "description": "从零到一的产品设计案例，涵盖用户研究、交互原型与视觉设计。",
@@ -54,7 +69,10 @@
         "image": ""
       },
       {
-        "tags": ["Frontend", "React"],
+        "tags": [
+          "Frontend",
+          "React"
+        ],
         "title": "项目名称二",
         "title_en": "Project Beta",
         "description": "一个注重细节和交互体验的前端实现，追求像素级还原。",
@@ -62,7 +80,10 @@
         "image": ""
       },
       {
-        "tags": ["UI/UX", "Design System"],
+        "tags": [
+          "UI/UX",
+          "Design System"
+        ],
         "title": "项目名称三",
         "title_en": "Project Gamma",
         "description": "一套完整的设计系统，统一品牌语言，提升团队协作效率。",
@@ -70,7 +91,10 @@
         "image": ""
       },
       {
-        "tags": ["Full-stack", "TypeScript"],
+        "tags": [
+          "Full-stack",
+          "TypeScript"
+        ],
         "title": "项目名称四",
         "title_en": "Project Delta",
         "description": "全栈应用实践，从数据库设计到前端交互的全流程探索。",
