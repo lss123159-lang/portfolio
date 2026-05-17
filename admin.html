@@ -585,11 +585,24 @@
       return adminLang === "en" ? baseKey + "_en" : baseKey;
     }
 
-    // 获取对象的双语值（合并 config + defaults）
-    function lv(obj, baseKey, fallback) {
+    // 获取嵌套对象的值（用于数组项等非顶层字段）
+    function lov(obj, baseKey) {
       const key = adminLang === "en" ? baseKey + "_en" : baseKey;
-      if (config[obj] && config[obj][key] !== undefined && config[obj][key] !== "") return config[obj][key];
-      if (defaults[obj] && defaults[obj][key] !== undefined) return defaults[obj][key];
+      return (obj && obj[key]) ? obj[key] : "";
+    }
+
+    // 获取顶层字段的合并值（config 覆盖 defaults）
+    // 用法：lv("hero", "greeting") 或 lv(heroObj, "greeting")
+    function lv(section, baseKey, fallback) {
+      const key = adminLang === "en" ? baseKey + "_en" : baseKey;
+      // 字符串 → 读取 config[section] / defaults[section]
+      if (typeof section === "string") {
+        if (config[section] && config[section][key] !== undefined && config[section][key] !== "") return config[section][key];
+        if (defaults[section] && defaults[section][key] !== undefined) return defaults[section][key];
+        return fallback || "";
+      }
+      // 对象 → 直接从对象读取，回退
+      if (section && section[key] !== undefined && section[key] !== "") return section[key];
       return fallback || "";
     }
 
@@ -757,10 +770,12 @@
 
     // =============== 导航面板 ===============
     function renderNavPanel() {
-      const nav = config.nav || {};
-      const logo = esc(lv(nav, "logo") || "");
+      const navLinks = (config.nav && config.nav.links && config.nav.links.length)
+        ? config.nav.links
+        : (defaults.nav ? defaults.nav.links : []);
+      const logo = esc(lv('nav', 'logo') || "");
       let links = "";
-      (nav.links || []).forEach((link, i) => {
+      navLinks.forEach((link, i) => {
         links += `
           <div class="list-item">
             <div class="list-item-header">
@@ -775,11 +790,11 @@
               <div class="field-row">
                 <div class="field">
                   <label class="field-label">显示文字</label>
-                  <input class="field-input nav-link-label" type="text" value="${esc(lv(link, 'label'))}" data-index="${i}">
+                  <input class="field-input nav-link-label" type="text" value="${esc(lov(link, 'label'))}" data-index="${i}">
                 </div>
                 <div class="field">
                   <label class="field-label">链接目标</label>
-                  <input class="field-input nav-link-href" type="text" value="${esc(link.href)}" data-index="${i}">
+                  <input class="field-input nav-link-href" type="text" value="${esc(link.href || '')}" data-index="${i}">
                 </div>
               </div>
             </div>
@@ -791,8 +806,8 @@
           <h2 class="panel-title">导航设置 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
           <p class="panel-desc">修改顶部导航栏的 Logo 和链接。</p>
           <div class="field">
-            <label class="field-label">Logo 文字</label>
-            <input class="field-input" id="nav-logo" type="text" value="${logo}" maxlength="8">
+            ${fieldLabel('Logo 文字', 'nav', 'logo')}
+            <input class="field-input" id="nav-logo" type="text" value="${logo}" maxlength="8" placeholder="${esc(defaults.nav.logo)}">
           </div>
           <div class="field">
             <label class="field-label">导航链接</label>
@@ -878,14 +893,17 @@
 
     // =============== 作品面板 ===============
     function renderWorksPanel() {
-      const works = config.works || {};
-      const tag = esc(works.tag || "");
-      const title = esc(works.title || "");
+      const wdef = defaults.works || {};
+      const wcfg = config.works || {};
+      const tag = esc(lv('works', 'tag') || "");
+      const title = esc(lv('works', 'title') || "");
+      // items: 用 config 的列表，fallback 到 defaults
+      const items = (wcfg.items && wcfg.items.length ? wcfg.items : wdef.items || []);
 
-      let items = "";
-      (works.items || []).forEach((item, i) => {
+      let itemsHtml = "";
+      items.forEach((item, i) => {
         const tagsStr = (item.tags || []).join(", ");
-        items += `
+        itemsHtml += `
           <div class="list-item">
             <div class="list-item-header">
               <span class="list-item-index">项目 ${i + 1}</span>
@@ -902,15 +920,15 @@
               </div>
               <div class="field">
                 <label class="field-label">项目名称</label>
-                <input class="field-input work-title" type="text" value="${esc(item.title || "")}" data-index="${i}">
+                <input class="field-input work-title" type="text" value="${esc(lov(item, 'title'))}" data-index="${i}">
               </div>
               <div class="field">
                 <label class="field-label">项目描述</label>
-                <textarea class="field-textarea work-desc" data-index="${i}" rows="2">${esc(item.description || "")}</textarea>
+                <textarea class="field-textarea work-desc" data-index="${i}" rows="2">${esc(lov(item, 'description'))}</textarea>
               </div>
               <div class="field">
                 <label class="field-label">图片路径（可选，留空显示占位图）</label>
-                <input class="field-input work-image" type="text" value="${esc(item.image || "")}" data-index="${i}" placeholder="如：images/my-project.jpg">
+                <input class="field-input work-image" type="text" value="${esc(item.image || '')}" data-index="${i}" placeholder="如：images/my-project.jpg">
               </div>
             </div>
           </div>`;
@@ -918,33 +936,35 @@
 
       return `
         <div class="panel active">
-          <h2 class="panel-title">作品展示</h2>
+          <h2 class="panel-title">作品展示 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
           <p class="panel-desc">管理作品集区域的内容。</p>
           <div class="field-row">
             <div class="field">
-              <label class="field-label">区块标签</label>
-              <input class="field-input" id="works-tag" type="text" value="${tag}">
+              ${fieldLabel('区块标签', 'works', 'tag')}
+              <input class="field-input" id="works-tag" type="text" value="${tag}" placeholder="${esc(wdef.tag || '')}">
             </div>
             <div class="field">
-              <label class="field-label">区块标题</label>
-              <input class="field-input" id="works-title" type="text" value="${title}">
+              ${fieldLabel('区块标题', 'works', 'title')}
+              <input class="field-input" id="works-title" type="text" value="${title}" placeholder="${esc(wdef.title || '')}">
             </div>
           </div>
-          <div class="field"><label class="field-label">作品列表</label>${items}</div>
+          <div class="field"><label class="field-label">作品列表</label>${itemsHtml}</div>
           <button class="add-btn" onclick="addWorkItem()">+ 添加作品</button>
         </div>`;
     }
 
     // =============== 关于面板 ===============
     function renderAboutPanel() {
-      const about = config.about || {};
-      const tag = esc(about.tag || "");
-      const title = esc(about.title || "");
-
-      const skillsStr = (about.skills || []).join(", ");
+      const adef = defaults.about || {};
+      const acfg = config.about || {};
+      const tag = esc(lv('about', 'tag') || "");
+      const title = esc(lv('about', 'title') || "");
+      const skills = (acfg.skills && acfg.skills.length ? acfg.skills : adef.skills || []);
+      const skillsStr = skills.join(", ");
+      const expList = (acfg.experience && acfg.experience.length ? acfg.experience : adef.experience || []);
 
       let exp = "";
-      (about.experience || []).forEach((item, i) => {
+      expList.forEach((item, i) => {
         exp += `
           <div class="list-item">
             <div class="list-item-header">
@@ -958,15 +978,15 @@
             <div class="list-item-fields">
               <div class="field">
                 <label class="field-label">时间</label>
-                <input class="field-input exp-date" type="text" value="${esc(item.date || "")}" data-index="${i}">
+                <input class="field-input exp-date" type="text" value="${esc(lov(item, 'date'))}" data-index="${i}">
               </div>
               <div class="field">
                 <label class="field-label">标题</label>
-                <input class="field-input exp-title" type="text" value="${esc(item.title || "")}" data-index="${i}">
+                <input class="field-input exp-title" type="text" value="${esc(lov(item, 'title'))}" data-index="${i}">
               </div>
               <div class="field">
                 <label class="field-label">描述</label>
-                <input class="field-input exp-desc" type="text" value="${esc(item.description || "")}" data-index="${i}">
+                <input class="field-input exp-desc" type="text" value="${esc(lov(item, 'description'))}" data-index="${i}">
               </div>
             </div>
           </div>`;
@@ -974,11 +994,11 @@
 
       return `
         <div class="panel active">
-          <h2 class="panel-title">关于页面</h2>
+          <h2 class="panel-title">关于页面 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
           <p class="panel-desc">管理技能标签和经历时间线。</p>
           <div class="field-row">
-            <div class="field"><label class="field-label">区块标签</label><input class="field-input" id="about-tag" type="text" value="${tag}"></div>
-            <div class="field"><label class="field-label">区块标题</label><input class="field-input" id="about-title" type="text" value="${title}"></div>
+            <div class="field">${fieldLabel('区块标签', 'about', 'tag')}<input class="field-input" id="about-tag" type="text" value="${tag}" placeholder="${esc(adef.tag || '')}"></div>
+            <div class="field">${fieldLabel('区块标题', 'about', 'title')}<input class="field-input" id="about-title" type="text" value="${title}" placeholder="${esc(adef.title || '')}"></div>
           </div>
           <div class="field">
             <label class="field-label">技能标签（逗号分隔）</label>
@@ -991,13 +1011,15 @@
 
     // =============== 联系面板 ===============
     function renderContactPanel() {
-      const contact = config.contact || {};
-      const tag = esc(contact.tag || "");
-      const title = esc(contact.title || "");
-      const text = esc(contact.text || "");
+      const cdef = defaults.contact || {};
+      const ccfg = config.contact || {};
+      const tag = esc(lv('contact', 'tag') || "");
+      const title = esc(lv('contact', 'title') || "");
+      const text = esc(lv('contact', 'text') || "");
+      const linksList = (ccfg.links && ccfg.links.length ? ccfg.links : cdef.links || []);
 
       let links = "";
-      (contact.links || []).forEach((link, i) => {
+      linksList.forEach((link, i) => {
         links += `
           <div class="list-item">
             <div class="list-item-header">
@@ -1010,25 +1032,25 @@
             </div>
             <div class="list-item-fields">
               <div class="field-row">
-                <div class="field"><label class="field-label">显示文字</label><input class="field-input contact-label" type="text" value="${esc(link.label || "")}" data-index="${i}"></div>
-                <div class="field"><label class="field-label">图标 (email/github)</label><input class="field-input contact-icon" type="text" value="${esc(link.icon || "")}" data-index="${i}"></div>
+                <div class="field"><label class="field-label">显示文字</label><input class="field-input contact-label" type="text" value="${esc(lov(link, 'label'))}" data-index="${i}"></div>
+                <div class="field"><label class="field-label">图标 (email/github)</label><input class="field-input contact-icon" type="text" value="${esc(link.icon || '')}" data-index="${i}"></div>
               </div>
-              <div class="field"><label class="field-label">链接</label><input class="field-input contact-href" type="text" value="${esc(link.href || "")}" data-index="${i}"></div>
+              <div class="field"><label class="field-label">链接</label><input class="field-input contact-href" type="text" value="${esc(link.href || '')}" data-index="${i}"></div>
             </div>
           </div>`;
       });
 
       return `
         <div class="panel active">
-          <h2 class="panel-title">联系方式</h2>
+          <h2 class="panel-title">联系方式 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
           <p class="panel-desc">管理联系区域的内容和链接。</p>
           <div class="field-row">
-            <div class="field"><label class="field-label">区块标签</label><input class="field-input" id="contact-tag" type="text" value="${tag}"></div>
-            <div class="field"><label class="field-label">区块标题</label><input class="field-input" id="contact-title" type="text" value="${title}"></div>
+            <div class="field">${fieldLabel('区块标签', 'contact', 'tag')}<input class="field-input" id="contact-tag" type="text" value="${tag}" placeholder="${esc(cdef.tag || '')}"></div>
+            <div class="field">${fieldLabel('区块标题', 'contact', 'title')}<input class="field-input" id="contact-title" type="text" value="${title}" placeholder="${esc(cdef.title || '')}"></div>
           </div>
           <div class="field">
-            <label class="field-label">介绍文字</label>
-            <textarea class="field-textarea" id="contact-text" rows="2">${text}</textarea>
+            ${fieldLabel('介绍文字', 'contact', 'text')}
+            <textarea class="field-textarea" id="contact-text" rows="2" placeholder="${esc((cdef.text || '').replace(/<[^>]*>/g, ''))}">${text}</textarea>
           </div>
           <div class="field"><label class="field-label">联系链接</label>${links}</div>
           <button class="add-btn" onclick="addContactLink()">+ 添加链接</button>
@@ -1043,16 +1065,16 @@
           <h2 class="panel-title">站点设置 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
           <p class="panel-desc">站点标题、描述和 Footer 文字。</p>
           <div class="field">
-            <label class="field-label">站点标题（浏览器标签）</label>
-            <input class="field-input" id="site-title" type="text" value="${esc(lv(site, 'title'))}">
+            ${fieldLabel('站点标题（浏览器标签）', 'site', 'title')}
+            <input class="field-input" id="site-title" type="text" value="${esc(lv('site', 'title'))}" placeholder="${esc(defaults.site.title)}">
           </div>
           <div class="field">
-            <label class="field-label">SEO 描述</label>
-            <input class="field-input" id="site-desc" type="text" value="${esc(lv(site, 'description'))}">
+            ${fieldLabel('SEO 描述', 'site', 'description')}
+            <input class="field-input" id="site-desc" type="text" value="${esc(lv('site', 'description'))}" placeholder="${esc(defaults.site.description)}">
           </div>
           <div class="field">
-            <label class="field-label">Footer 文字</label>
-            <input class="field-input" id="site-footer" type="text" value="${esc(lv(site, 'footer'))}">
+            ${fieldLabel('Footer 文字', 'site', 'footer')}
+            <input class="field-input" id="site-footer" type="text" value="${esc(lv('site', 'footer'))}" placeholder="${esc(defaults.site.footer)}">
           </div>
         </div>`;
     }
