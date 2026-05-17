@@ -517,6 +517,7 @@
     <span class="topbar-title">Portfolio 管理面板</span>
     <div class="topbar-actions">
       <span class="status" id="status"></span>
+      <button class="btn" onclick="toggleAdminLang()" id="lang-toggle-btn" style="font-weight:600;">中</button>
       <button class="btn" onclick="revertConfig()">撤回修改</button>
       <button class="btn" onclick="previewSite()">预览网站</button>
       <button class="btn btn-primary" onclick="saveConfig()">保存更改</button>
@@ -544,6 +545,27 @@
 
   <script>
     let config = {};
+    let adminLang = "zh"; // 管理面板当前编辑的语言
+
+    // 双语辅助：返回当前语言对应的 key
+    function lk(baseKey) {
+      return adminLang === "en" ? baseKey + "_en" : baseKey;
+    }
+
+    // 获取对象的双语值
+    function lv(obj, baseKey, fallback) {
+      const key = adminLang === "en" ? baseKey + "_en" : baseKey;
+      return obj[key] || "";
+    }
+
+    // 切换编辑语言
+    function toggleAdminLang() {
+      collectFormData(); // 先保存当前输入
+      adminLang = adminLang === "zh" ? "en" : "zh";
+      const btn = document.getElementById("lang-toggle-btn");
+      if (btn) btn.textContent = adminLang === "zh" ? "中" : "EN";
+      renderPanel(); // 用新语言重新渲染
+    }
 
     // 加载配置
     async function loadConfig() {
@@ -671,7 +693,7 @@
     // =============== 导航面板 ===============
     function renderNavPanel() {
       const nav = config.nav || {};
-      const logo = esc(nav.logo || "");
+      const logo = esc(lv(nav, "logo") || "");
       let links = "";
       (nav.links || []).forEach((link, i) => {
         links += `
@@ -688,7 +710,7 @@
               <div class="field-row">
                 <div class="field">
                   <label class="field-label">显示文字</label>
-                  <input class="field-input nav-link-label" type="text" value="${esc(link.label)}" data-index="${i}">
+                  <input class="field-input nav-link-label" type="text" value="${esc(lv(link, 'label'))}" data-index="${i}">
                 </div>
                 <div class="field">
                   <label class="field-label">链接目标</label>
@@ -701,7 +723,7 @@
 
       return `
         <div class="panel active">
-          <h2 class="panel-title">导航设置</h2>
+          <h2 class="panel-title">导航设置 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
           <p class="panel-desc">修改顶部导航栏的 Logo 和链接。</p>
           <div class="field">
             <label class="field-label">Logo 文字</label>
@@ -727,23 +749,23 @@
       };
       return `
         <div class="panel active">
-          <h2 class="panel-title">Hero 区域</h2>
-          <p class="panel-desc">首页第一屏的标题和介绍语。留空则使用默认值。</p>
+          <h2 class="panel-title">Hero 区域 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
+          <p class="panel-desc">首页第一屏的标题和介绍语。留空则使用默认值。点顶部「中/EN」按钮切换编辑语言。</p>
           <div class="field">
             <label class="field-label">问候语 <span class="field-hint">（默认：${esc(defaults.greeting)}）</span></label>
-            <input class="field-input hero-field" id="hero-greeting" type="text" value="${esc(hero.greeting || "")}" placeholder="${esc(defaults.greeting)}" oninput="updateHeroPreview()">
+            <input class="field-input hero-field" id="hero-greeting" type="text" value="${esc(lv(hero, 'greeting'))}" placeholder="${esc(defaults.greeting)}" oninput="updateHeroPreview()">
           </div>
           <div class="field">
             <label class="field-label">名字 <span class="field-hint">（默认：${esc(defaults.name)}）</span></label>
-            <input class="field-input hero-field" id="hero-name" type="text" value="${esc(hero.name || "")}" placeholder="${esc(defaults.name)}" oninput="updateHeroPreview()">
+            <input class="field-input hero-field" id="hero-name" type="text" value="${esc(lv(hero, 'name'))}" placeholder="${esc(defaults.name)}" oninput="updateHeroPreview()">
           </div>
           <div class="field">
             <label class="field-label">副标题 <span class="field-hint">（默认：${esc(defaults.tagline)}）</span></label>
-            <input class="field-input hero-field" id="hero-tagline" type="text" value="${esc(hero.tagline || "")}" placeholder="${esc(defaults.tagline)}" oninput="updateHeroPreview()">
+            <input class="field-input hero-field" id="hero-tagline" type="text" value="${esc(lv(hero, 'tagline'))}" placeholder="${esc(defaults.tagline)}" oninput="updateHeroPreview()">
           </div>
           <div class="field">
             <label class="field-label">详细介绍 <span class="field-hint">（默认一句话）</span></label>
-            <textarea class="field-textarea hero-field" id="hero-desc" rows="3" placeholder="${esc(defaults.description.replace(/<[^>]*>/g, ''))}" oninput="updateHeroPreview()">${esc(hero.description || "")}</textarea>
+            <textarea class="field-textarea hero-field" id="hero-desc" rows="3" placeholder="${esc(defaults.description.replace(/<[^>]*>/g, ''))}" oninput="updateHeroPreview()">${esc(lv(hero, 'description'))}</textarea>
             <span class="field-hint">支持 HTML，可使用 &lt;span class="text-accent"&gt;文字&lt;/span&gt; 添加强调色</span>
           </div>
           <hr style="border:none;border-top:1px solid var(--admin-border);margin:24px 0;">
@@ -752,9 +774,9 @@
             <label class="field-label">实时预览</label>
             <div class="hero-preview" id="hero-preview">
               <div class="hero-preview-inner">
-                <h1 class="hero-preview-title"><span id="pv-greeting">${esc(hero.greeting || defaults.greeting)}</span> <span class="hero-preview-name" id="pv-name">${esc(hero.name || defaults.name)}</span></h1>
-                <p class="hero-preview-sub" id="pv-tagline">${esc(hero.tagline || defaults.tagline)}</p>
-                <p class="hero-preview-desc" id="pv-desc">${hero.description || defaults.description}</p>
+                <h1 class="hero-preview-title"><span id="pv-greeting">${esc(lv(hero, 'greeting') || defaults.greeting)}</span> <span class="hero-preview-name" id="pv-name">${esc(lv(hero, 'name') || defaults.name)}</span></h1>
+                <p class="hero-preview-sub" id="pv-tagline">${esc(lv(hero, 'tagline') || defaults.tagline)}</p>
+                <p class="hero-preview-desc" id="pv-desc">${lv(hero, 'description') || defaults.description}</p>
               </div>
             </div>
           </div>
@@ -953,19 +975,19 @@
       const site = config.site || {};
       return `
         <div class="panel active">
-          <h2 class="panel-title">站点设置</h2>
+          <h2 class="panel-title">站点设置 <span style="font-size:12px;color:var(--admin-accent);font-weight:400;">— 正在编辑：${adminLang === 'zh' ? '中文' : 'English'}</span></h2>
           <p class="panel-desc">站点标题、描述和 Footer 文字。</p>
           <div class="field">
             <label class="field-label">站点标题（浏览器标签）</label>
-            <input class="field-input" id="site-title" type="text" value="${esc(site.title || "")}">
+            <input class="field-input" id="site-title" type="text" value="${esc(lv(site, 'title'))}">
           </div>
           <div class="field">
             <label class="field-label">SEO 描述</label>
-            <input class="field-input" id="site-desc" type="text" value="${esc(site.description || "")}">
+            <input class="field-input" id="site-desc" type="text" value="${esc(lv(site, 'description'))}">
           </div>
           <div class="field">
             <label class="field-label">Footer 文字</label>
-            <input class="field-input" id="site-footer" type="text" value="${esc(site.footer || "")}">
+            <input class="field-input" id="site-footer" type="text" value="${esc(lv(site, 'footer'))}">
           </div>
         </div>`;
     }
@@ -1006,19 +1028,19 @@
           // 已通过事件实时同步到 config.theme
           break;
         case "nav":
-          config.nav.logo = document.getElementById("nav-logo")?.value || "";
+          config.nav[lk("logo")] = document.getElementById("nav-logo")?.value || "";
           document.querySelectorAll(".nav-link-label").forEach((el) => {
-            config.nav.links[parseInt(el.dataset.index)].label = el.value;
+            config.nav.links[parseInt(el.dataset.index)][lk("label")] = el.value;
           });
           document.querySelectorAll(".nav-link-href").forEach((el) => {
             config.nav.links[parseInt(el.dataset.index)].href = el.value;
           });
           break;
         case "hero":
-          config.hero.greeting = document.getElementById("hero-greeting")?.value || "";
-          config.hero.name = document.getElementById("hero-name")?.value || "";
-          config.hero.tagline = document.getElementById("hero-tagline")?.value || "";
-          config.hero.description = document.getElementById("hero-desc")?.value || "";
+          config.hero[lk("greeting")] = document.getElementById("hero-greeting")?.value || "";
+          config.hero[lk("name")] = document.getElementById("hero-name")?.value || "";
+          config.hero[lk("tagline")] = document.getElementById("hero-tagline")?.value || "";
+          config.hero[lk("description")] = document.getElementById("hero-desc")?.value || "";
           config.hero.videoEnabled = document.getElementById("hero-video-enabled")?.checked || false;
           config.hero.video = document.getElementById("hero-video")?.value || "";
           break;
@@ -1069,9 +1091,9 @@
           });
           break;
         case "site":
-          config.site.title = document.getElementById("site-title")?.value || "";
-          config.site.description = document.getElementById("site-desc")?.value || "";
-          config.site.footer = document.getElementById("site-footer")?.value || "";
+          config.site[lk("title")] = document.getElementById("site-title")?.value || "";
+          config.site[lk("description")] = document.getElementById("site-desc")?.value || "";
+          config.site[lk("footer")] = document.getElementById("site-footer")?.value || "";
           break;
       }
     }
