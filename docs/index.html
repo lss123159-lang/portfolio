@@ -6,18 +6,6 @@
   <meta name="description" content="个人作品集 - 设计与开发">
   <title>Portfolio</title>
   <style>
-/* 从 config.json 注入的配色 */
-:root {
-  --color-bg: #fafaf8;
-  --color-surface: #ffffff;
-  --color-text: #1a1a18;
-  --color-text-secondary: #787870;
-  --color-text-muted: #b0b0a8;
-  --color-border: #e8e6e0;
-  --color-border-light: #f0eeea;
-  --color-accent: #8b8578;
-  --color-accent-soft: #f3f1ec;
-}
 /* ========================================
    设计 Token
    ======================================== */
@@ -794,256 +782,570 @@ img {
   }
 }
 
+
+/* === 配色（从 config 注入）=== */
+:root {
+  --color-bg: #fafaf8;
+  --color-surface: #ffffff;
+  --color-text: #1a1a18;
+  --color-text-secondary: #787870;
+  --color-text-muted: #b0b0a8;
+  --color-border: #e8e6e0;
+  --color-border-light: #f0eeea;
+  --color-accent: #8b8578;
+  --color-accent-soft: #f3f1ec;
+}
   </style>
 </head>
 <body>
 
   <nav class="nav" id="nav">
     <div class="nav-inner">
-      <a href="#hero" class="nav-logo">K</a>
-      <ul class="nav-links" id="nav-links"><li><a href="#works">作品</a></li><li><a href="#about">关于</a></li><li><a href="#contact">联系</a></li></ul>
+      <a href="#hero" class="nav-logo" id="nav-logo">K</a>
+      <ul class="nav-links" id="nav-links"></ul>
       <button class="nav-toggle" id="nav-toggle" aria-label="菜单">
         <span></span><span></span>
       </button>
     </div>
   </nav>
+
   <main>
 
-  <section class="hero" id="hero">
-    <div class="hero-video-wrap">
-        <video class="hero-video" autoplay muted loop playsinline preload="metadata" src="images/hero-bg.mp4" poster="images/poster.jpg"></video>
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="hero-video-wrap" id="hero-video-wrap">
+        <video class="hero-video" id="hero-video" autoplay muted loop playsinline preload="metadata"></video>
         <div class="hero-overlay"></div>
       </div>
-    <div class="hero-content">
-      <h1 class="hero-title">你好，我是 <span class="hero-name">你的名字</span></h1>
-      <p class="hero-sub">创造简洁、好用、有温度的数字体验。</p>
-      <p class="hero-desc">专注于<span class="text-accent">产品设计</span>与<span class="text-accent">前端开发</span>，<br>相信好的设计应该是"看起来毫不费力"的。</p>
-    </div>
-    <div class="scroll-hint"><span class="scroll-line"></span></div>
-  </section>
+      <div class="hero-content">
+        <h1 class="hero-title" id="hero-title"></h1>
+        <p class="hero-sub" id="hero-sub"></p>
+        <p class="hero-desc" id="hero-desc"></p>
+      </div>
+      <div class="scroll-hint">
+        <span class="scroll-line"></span>
+      </div>
+    </section>
 
-  <section class="section" id="works">
-    <div class="section-header">
-      <span class="section-tag">作品</span>
-      <h2 class="section-title">近期项目</h2>
-    </div>
-    <div class="works-grid">
-    <article class="work-card">
-      <div class="work-image"><div class="work-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div></div>
-      <div class="work-info">
-        <div class="work-tags"><span class="tag">Product Design</span><span class="tag">Branding</span></div>
-        <h3 class="work-title">项目名称一</h3>
-        <p class="work-desc">从零到一的产品设计案例，涵盖用户研究、交互原型与视觉设计。</p>
+    <!-- 作品展示 -->
+    <section class="section" id="works">
+      <div class="section-header">
+        <span class="section-tag" id="works-tag"></span>
+        <h2 class="section-title" id="works-title"></h2>
       </div>
-    </article>
-    <article class="work-card">
-      <div class="work-image"><div class="work-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="12" cy="12" r="2"/><path d="M12 6v2M12 16v2M6 12h2M16 12h2"/></svg></div></div>
-      <div class="work-info">
-        <div class="work-tags"><span class="tag">Frontend</span><span class="tag">React</span></div>
-        <h3 class="work-title">项目名称二</h3>
-        <p class="work-desc">一个注重细节和交互体验的前端实现，追求像素级还原。</p>
-      </div>
-    </article>
-    <article class="work-card">
-      <div class="work-image"><div class="work-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div></div>
-      <div class="work-info">
-        <div class="work-tags"><span class="tag">UI/UX</span><span class="tag">Design System</span></div>
-        <h3 class="work-title">项目名称三</h3>
-        <p class="work-desc">一套完整的设计系统，统一品牌语言，提升团队协作效率。</p>
-      </div>
-    </article>
-    <article class="work-card">
-      <div class="work-image"><div class="work-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg></div></div>
-      <div class="work-info">
-        <div class="work-tags"><span class="tag">Full-stack</span><span class="tag">TypeScript</span></div>
-        <h3 class="work-title">项目名称四</h3>
-        <p class="work-desc">全栈应用实践，从数据库设计到前端交互的全流程探索。</p>
-      </div>
-    </article></div>
-  </section>
+      <div class="works-grid" id="works-grid"></div>
+    </section>
 
-  <section class="section" id="about">
-    <div class="section-header">
-      <span class="section-tag">关于</span>
-      <h2 class="section-title">技能与经历</h2>
-    </div>
-    <div class="about-grid">
-      <div class="about-block">
-        <h3 class="about-label">技能</h3>
-        <div class="skill-tags"><span class="skill-tag">Product Design</span><span class="skill-tag">UI/UX</span><span class="skill-tag">Figma</span><span class="skill-tag">HTML &amp; CSS</span><span class="skill-tag">JavaScript</span><span class="skill-tag">TypeScript</span><span class="skill-tag">React</span><span class="skill-tag">Node.js</span><span class="skill-tag">Design Systems</span><span class="skill-tag">Prototyping</span></div>
+    <!-- 关于 -->
+    <section class="section" id="about">
+      <div class="section-header">
+        <span class="section-tag" id="about-tag"></span>
+        <h2 class="section-title" id="about-title"></h2>
       </div>
-      <div class="about-block">
-        <h3 class="about-label">经历</h3>
-        <ul class="timeline">
-    <li class="timeline-item">
-      <span class="timeline-dot"></span>
-      <div class="timeline-content">
-        <span class="timeline-date">2024 — 至今</span>
-        <h4 class="timeline-title">高级产品设计师</h4>
-        <p class="timeline-desc">某科技公司 · 负责核心产品线的设计策略与执行</p>
+      <div class="about-grid">
+        <div class="about-block">
+          <h3 class="about-label">技能</h3>
+          <div class="skill-tags" id="skill-tags"></div>
+        </div>
+        <div class="about-block">
+          <h3 class="about-label">经历</h3>
+          <ul class="timeline" id="timeline"></ul>
+        </div>
       </div>
-    </li>
-    <li class="timeline-item">
-      <span class="timeline-dot"></span>
-      <div class="timeline-content">
-        <span class="timeline-date">2021 — 2024</span>
-        <h4 class="timeline-title">前端开发工程师</h4>
-        <p class="timeline-desc">某互联网公司 · 负责 B 端产品的架构与开发</p>
-      </div>
-    </li>
-    <li class="timeline-item">
-      <span class="timeline-dot"></span>
-      <div class="timeline-content">
-        <span class="timeline-date">2017 — 2021</span>
-        <h4 class="timeline-title">设计专业 · 本科</h4>
-        <p class="timeline-desc">某大学 · 数字媒体艺术 / 交互设计方向</p>
-      </div>
-    </li></ul>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="section" id="contact">
-    <div class="section-header">
-      <span class="section-tag">联系</span>
-      <h2 class="section-title">保持联系</h2>
-    </div>
-    <div class="contact-content">
-      <p class="contact-text">如果你对我的作品感兴趣，或者想一起合作，<br>欢迎随时联系我。</p>
-      <div class="contact-links">
-      <a href="mailto:yourname@example.com" class="contact-link">
-        <span class="contact-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/></svg></span>
-        yourname@example.com
-      </a>
-      <a href="https://github.com" class="contact-link" target="_blank" rel="noopener">
-        <span class="contact-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg></span>
-        GitHub
-      </a></div>
-    </div>
-  </section>
+    <!-- 联系方式 -->
+    <section class="section" id="contact">
+      <div class="section-header">
+        <span class="section-tag" id="contact-tag"></span>
+        <h2 class="section-title" id="contact-title"></h2>
+      </div>
+      <div class="contact-content">
+        <p class="contact-text" id="contact-text"></p>
+        <div class="contact-links" id="contact-links"></div>
+      </div>
+    </section>
+
   </main>
+
   <footer class="footer">
-    <p>&copy; 2026. 用心构建。</p>
+    <p id="footer-text">&copy; 2026</p>
   </footer>
-  <script>
-// ===== 静态版：双语 + 拉环 + 交互 =====
-(function () {
-  var config = {"site":{"title":"Portfolio","description":"个人作品集 - 设计与开发","footer":"用心构建。"},"theme":{"bg":"#fafaf8","surface":"#ffffff","text":"#1a1a18","textSecondary":"#787870","textMuted":"#b0b0a8","border":"#e8e6e0","borderLight":"#f0eeea","accent":"#8b8578","accentSoft":"#f3f1ec"},"nav":{"logo":"K","links":[{"label":"作品","href":"#works"},{"label":"关于","href":"#about"},{"label":"联系","href":"#contact"}]},"hero":{"greeting":"你好，我是","name":"你的名字","tagline":"创造简洁、好用、有温度的数字体验。","description":"专注于<span class=\"text-accent\">产品设计</span>与<span class=\"text-accent\">前端开发</span>，<br>相信好的设计应该是\"看起来毫不费力\"的。","video":"images/hero-bg.mp4","videoEnabled":true},"works":{"tag":"作品","title":"近期项目","items":[{"tags":["Product Design","Branding"],"title":"项目名称一","description":"从零到一的产品设计案例，涵盖用户研究、交互原型与视觉设计。","image":""},{"tags":["Frontend","React"],"title":"项目名称二","description":"一个注重细节和交互体验的前端实现，追求像素级还原。","image":""},{"tags":["UI/UX","Design System"],"title":"项目名称三","description":"一套完整的设计系统，统一品牌语言，提升团队协作效率。","image":""},{"tags":["Full-stack","TypeScript"],"title":"项目名称四","description":"全栈应用实践，从数据库设计到前端交互的全流程探索。","image":""}]},"about":{"tag":"关于","title":"技能与经历","skills":["Product Design","UI/UX","Figma","HTML & CSS","JavaScript","TypeScript","React","Node.js","Design Systems","Prototyping"],"experience":[{"date":"2024 — 至今","title":"高级产品设计师","description":"某科技公司 · 负责核心产品线的设计策略与执行"},{"date":"2021 — 2024","title":"前端开发工程师","description":"某互联网公司 · 负责 B 端产品的架构与开发"},{"date":"2017 — 2021","title":"设计专业 · 本科","description":"某大学 · 数字媒体艺术 / 交互设计方向"}]},"contact":{"tag":"联系","title":"保持联系","text":"如果你对我的作品感兴趣，或者想一起合作，<br>欢迎随时联系我。","links":[{"label":"yourname@example.com","href":"mailto:yourname@example.com","icon":"email"},{"label":"GitHub","href":"https://github.com","icon":"github"}]}};
-  var currentLang = (localStorage.getItem("lang") === "en") ? "en" : "zh";
 
-  function t(obj, key, fb) {
-    if (!obj) return fb || "";
-    if (currentLang === "en" && obj[key + "_en"]) return obj[key + "_en"];
-    return obj[key] || fb || "";
+  <script>window.__CONFIG__ = {"site":{"title":"Portfolio","description":"个人作品集 - 设计与开发","footer":"用心构建。"},"theme":{"bg":"#fafaf8","surface":"#ffffff","text":"#1a1a18","textSecondary":"#787870","textMuted":"#b0b0a8","border":"#e8e6e0","borderLight":"#f0eeea","accent":"#8b8578","accentSoft":"#f3f1ec"},"nav":{"logo":"K","links":[{"id":"nav-works","label":"作品","href":"#works"},{"id":"nav-about","label":"关于","href":"#about"},{"id":"nav-contact","label":"联系","href":"#contact"}]},"hero":{"greeting":"你好，我是","name":"你的名字","tagline":"创造简洁、好用、有温度的数字体验。","description":"专注于<span class=\"text-accent\">产品设计</span>与<span class=\"text-accent\">前端开发</span>，<br>相信好的设计应该是\"看起来毫不费力\"的。","video":"images/hero-bg.mp4","videoEnabled":true},"works":{"tag":"作品","title":"近期项目","items":[{"id":"work-1","tags":["Product Design","Branding"],"title":"项目名称一","description":"从零到一的产品设计案例，涵盖用户研究、交互原型与视觉设计。","image":""},{"id":"work-2","tags":["Frontend","React"],"title":"项目名称二","description":"一个注重细节和交互体验的前端实现，追求像素级还原。","image":""},{"id":"work-3","tags":["UI/UX","Design System"],"title":"项目名称三","description":"一套完整的设计系统，统一品牌语言，提升团队协作效率。","image":""},{"id":"work-4","tags":["Full-stack","TypeScript"],"title":"项目名称四","description":"全栈应用实践，从数据库设计到前端交互的全流程探索。","image":""}]},"about":{"tag":"关于","title":"技能与经历","skills":["Product Design","UI/UX","Figma","HTML & CSS","JavaScript","TypeScript","React","Node.js","Design Systems","Prototyping"],"experience":[{"id":"exp-1","date":"2024 — 至今","title":"高级产品设计师","description":"某科技公司 · 负责核心产品线的设计策略与执行"},{"id":"exp-2","date":"2021 — 2024","title":"前端开发工程师","description":"某互联网公司 · 负责 B 端产品的架构与开发"},{"id":"exp-3","date":"2017 — 2021","title":"设计专业 · 本科","description":"某大学 · 数字媒体艺术 / 交互设计方向"}]},"contact":{"tag":"联系","title":"保持联系","text":"如果你对我的作品感兴趣，或者想一起合作，<br>欢迎随时联系我。","links":[{"id":"contact-email","label":"yourname@example.com","href":"mailto:yourname@example.com","icon":"email"},{"id":"contact-github","label":"GitHub","href":"https://github.com","icon":"github"}]}};
+/**
+ * js/main.js — 前台渲染引擎（开发模式 + 静态模式通用）
+ *
+ * 开发模式：fetch /api/defaults + /api/config，合并后渲染
+ * 静态模式：读取 window.__CONFIG__，直接渲染（build.js 生成）
+ */
+
+let config = null;
+let defaults = null;
+let currentLang = "zh";
+
+/* ==========================================
+   深度合并（数组按 id 匹配）
+   ========================================== */
+
+function deepMerge(def, cfg) {
+  if (!cfg || typeof cfg !== "object") return def;
+  if (!def || typeof def !== "object") return cfg;
+
+  if (Array.isArray(def) && Array.isArray(cfg)) {
+    // 数组中有 id 字段 → 按 id 匹配合并
+    if (cfg.length > 0 && cfg[0] && typeof cfg[0] === "object" && cfg[0].id) {
+      return mergeArraysById(def, cfg);
+    }
+    // 无 id 的数组（如 skills）→ 用 config 覆盖
+    return cfg.length ? cfg : def;
   }
 
-  function escH(str) {
-    if (!str) return "";
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  var result = {};
+  for (var key in def) {
+    if (def.hasOwnProperty(key)) {
+      if (cfg[key] !== undefined && cfg[key] !== "" && cfg[key] !== null) {
+        result[key] = deepMerge(def[key], cfg[key]);
+      } else {
+        result[key] = def[key];
+      }
+    }
   }
-
-  function escA(str) {
-    if (!str) return "";
-    return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  for (var k in cfg) {
+    if (cfg.hasOwnProperty(k) && !(k in def)) {
+      result[k] = cfg[k];
+    }
   }
+  return result;
+}
 
-  function iconSVG(type) {
-    var icons = {
-      email: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/></svg>',
-      github: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>'
-    };
-    return icons[type] || icons.email;
-  }
+function mergeArraysById(def, cfg) {
+  var result = [];
+  var defMap = {};
+  def.forEach(function (item) {
+    if (item && item.id) defMap[item.id] = item;
+  });
 
-  function renderAll() {
-    var c = config, s = c.site, n = c.nav, h = c.hero, w = c.works, a = c.about, ct = c.contact;
-    // site
-    document.title = t(s, "title", "Portfolio");
-    var meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.content = t(s, "description", "");
-    var ft = document.getElementById("footer-text");
-    if (ft) ft.textContent = "\u00a9 " + new Date().getFullYear() + ". " + t(s, "footer", "");
-    // nav
-    var logo = document.getElementById("nav-logo");
-    if (logo) logo.textContent = t(n, "logo", "K");
-    var nl = document.getElementById("nav-links");
-    if (nl) nl.innerHTML = n.links.map(function(l) { return '<li><a href="' + escA(l.href) + '">' + escH(t(l, "label")) + '</a></li>'; }).join("");
-    // hero
-    var ht = document.getElementById("hero-title");
-    if (ht) ht.innerHTML = escH(t(h, "greeting", "\u4f60\u597d\uff0c\u6211\u662f")) + ' <span class="hero-name">' + escH(t(h, "name", "\u4f60\u7684\u540d\u5b57")) + '</span>';
-    var hs = document.getElementById("hero-sub");
-    if (hs) hs.textContent = t(h, "tagline", "");
-    var hd = document.getElementById("hero-desc");
-    if (hd) hd.innerHTML = t(h, "description", "");
-    // works
-    document.getElementById("works-tag").textContent = t(w, "tag", "");
-    document.getElementById("works-title").textContent = t(w, "title", "");
-    // about
-    document.getElementById("about-tag").textContent = t(a, "tag", "");
-    document.getElementById("about-title").textContent = t(a, "title", "");
-    var st = document.getElementById("skill-tags");
-    if (st) st.innerHTML = a.skills.map(function(s) { return '<span class="skill-tag">' + escH(typeof s === "string" ? s : s.name) + '</span>'; }).join("");
-    var tl = document.getElementById("timeline");
-    if (tl) tl.innerHTML = a.experience.map(function(exp) {
-      return '<li class="timeline-item"><span class="timeline-dot"></span><div class="timeline-content"><span class="timeline-date">' + escH(t(exp, "date")) + '</span><h4 class="timeline-title">' + escH(t(exp, "title")) + '</h4><p class="timeline-desc">' + escH(t(exp, "description")) + '</p></div></li>';
-    }).join("");
-    // contact
-    document.getElementById("contact-tag").textContent = t(ct, "tag", "");
-    document.getElementById("contact-title").textContent = t(ct, "title", "");
-    document.getElementById("contact-text").innerHTML = t(ct, "text", "");
-    var cl = document.getElementById("contact-links");
-    if (cl) cl.innerHTML = ct.links.map(function(link) {
-      var ext = link.href && (link.href.indexOf("http") === 0);
-      return '<a href="' + escA(link.href) + '" class="contact-link"' + (ext ? ' target="_blank" rel="noopener"' : "") + '><span class="contact-icon">' + iconSVG(link.icon) + '</span>' + escH(t(link, "label")) + '</a>';
-    }).join("");
-  }
+  // 按 defaults 顺序处理
+  def.forEach(function (item) {
+    if (!item || !item.id) { result.push(item); return; }
+    var cfgItem = null;
+    for (var i = 0; i < cfg.length; i++) {
+      if (cfg[i] && cfg[i].id === item.id) { cfgItem = cfg[i]; break; }
+    }
+    if (cfgItem) {
+      if (cfgItem._delete) return; // 标记删除
+      result.push(deepMerge(item, cfgItem));
+    } else {
+      result.push(item);
+    }
+  });
 
-  function switchLang() {
-    currentLang = currentLang === "zh" ? "en" : "zh";
-    localStorage.setItem("lang", currentLang);
-    var tab = document.getElementById("lang-tab");
-    if (tab) { tab.textContent = currentLang === "zh" ? "EN" : "\u4e2d"; }
+  // config 中新增的项（id 不在 defaults 中的）追加到末尾
+  cfg.forEach(function (item) {
+    if (!item || !item.id || item._delete) return;
+    if (!defMap[item.id]) {
+      result.push(item);
+    }
+  });
+
+  return result;
+}
+
+/* ==========================================
+   双语文本辅助
+   ========================================== */
+
+function t(obj, key, fallback) {
+  if (!obj) return fallback || "";
+  if (currentLang === "en" && obj[key + "_en"]) return obj[key + "_en"];
+  return obj[key] || fallback || "";
+}
+
+/* ==========================================
+   初始化
+   ========================================== */
+
+async function init() {
+  try {
+    // 静态模式：build.js 已嵌入 window.__CONFIG__
+    if (window.__CONFIG__) {
+      config = window.__CONFIG__;
+      var saved = localStorage.getItem("lang");
+      if (saved === "en") currentLang = "en";
+      applyTheme(config.theme);
+      renderAll();
+      setupPullTab();
+      setupScrollAnimations();
+      setupNavScroll();
+      setupMobileMenu();
+      setupSmoothScroll();
+      return;
+    }
+
+    // 开发模式：从 API 获取
+    var results = await Promise.all([
+      fetch("/api/defaults"),
+      fetch("/api/config"),
+    ]);
+    defaults = await results[0].json();
+    var userCfg = await results[1].json();
+    config = deepMerge(defaults, userCfg);
+
+    var saved = localStorage.getItem("lang");
+    if (saved === "en") currentLang = "en";
+
+    applyTheme(config.theme);
     renderAll();
+    setupPullTab();
+    setupScrollAnimations();
+    setupNavScroll();
+    setupMobileMenu();
+    setupSmoothScroll();
+  } catch (err) {
+    console.error("无法加载配置:", err);
+    var hero = document.getElementById("hero");
+    if (hero) {
+      hero.innerHTML =
+        '<div class="hero-content" style="text-align:center;">' +
+        '<h1 class="hero-title">请通过服务器访问</h1>' +
+        '<p class="hero-sub" style="margin-bottom:20px;">在终端运行以下命令启动服务器：</p>' +
+        '<p style="font-size:16px;background:var(--color-accent-soft);display:inline-block;padding:12px 24px;border-radius:8px;font-family:monospace;margin-bottom:24px;">npm start</p>' +
+        '<p class="hero-desc">然后访问 <a href="http://localhost:3000" style="color:var(--color-accent);text-decoration:underline;">http://localhost:3000</a></p>' +
+        '</div>';
+    }
+  }
+}
+
+/* ==========================================
+   全量渲染
+   ========================================== */
+
+function renderAll() {
+  renderSite(config.site);
+  renderNav(config.nav);
+  renderHero(config.hero);
+  renderWorks(config.works);
+  renderAbout(config.about);
+  renderContact(config.contact);
+}
+
+/* ==========================================
+   语言切换
+   ========================================== */
+
+function switchLanguage() {
+  currentLang = currentLang === "zh" ? "en" : "zh";
+  localStorage.setItem("lang", currentLang);
+  updatePullTabLabel();
+  renderAll();
+  document.querySelectorAll(".animate.visible").forEach(function (el) {
+    el.classList.remove("animate", "visible");
+  });
+  setupScrollAnimations();
+}
+
+/* ==========================================
+   配色注入
+   ========================================== */
+
+function applyTheme(theme) {
+  if (!theme) return;
+  var root = document.documentElement;
+  var map = {
+    bg: "--color-bg",
+    surface: "--color-surface",
+    text: "--color-text",
+    textSecondary: "--color-text-secondary",
+    textMuted: "--color-text-muted",
+    border: "--color-border",
+    borderLight: "--color-border-light",
+    accent: "--color-accent",
+    accentSoft: "--color-accent-soft",
+  };
+  for (var key in map) {
+    if (theme[key]) root.style.setProperty(map[key], theme[key]);
+  }
+}
+
+/* ==========================================
+   各区块渲染
+   ========================================== */
+
+function renderSite(site) {
+  if (!site) return;
+  document.title = t(site, "title", "Portfolio");
+  var meta = document.querySelector('meta[name="description"]');
+  if (meta) meta.content = t(site, "description", "");
+  var footer = document.getElementById("footer-text");
+  if (footer) footer.textContent = "© " + new Date().getFullYear() + ". " + t(site, "footer", "");
+}
+
+function renderNav(nav) {
+  if (!nav) return;
+  var logo = document.getElementById("nav-logo");
+  if (logo) logo.textContent = t(nav, "logo", "K");
+  var linksEl = document.getElementById("nav-links");
+  if (!linksEl || !nav.links) return;
+  linksEl.innerHTML = nav.links
+    .map(function (l) {
+      return '<li><a href="' + escAttr(l.href) + '">' + escHtml(t(l, "label")) + '</a></li>';
+    })
+    .join("");
+}
+
+function renderHero(hero) {
+  if (!hero) return;
+  var titleEl = document.getElementById("hero-title");
+  var subEl = document.getElementById("hero-sub");
+  var descEl = document.getElementById("hero-desc");
+  var greeting = t(hero, "greeting", "你好，我是");
+  var name = t(hero, "name", "你的名字");
+  var tagline = t(hero, "tagline", "创造简洁、好用、有温度的数字体验。");
+  var desc = t(hero, "description", '专注于<span class="text-accent">产品设计</span>与<span class="text-accent">前端开发</span>');
+
+  if (titleEl) titleEl.innerHTML = escHtml(greeting) + ' <span class="hero-name">' + escHtml(name) + '</span>';
+  if (subEl) subEl.textContent = tagline;
+  if (descEl) descEl.innerHTML = desc;
+
+  var video = document.getElementById("hero-video");
+  var videoWrap = document.getElementById("hero-video-wrap");
+  if (video && videoWrap) {
+    if (hero.videoEnabled && hero.video) {
+      video.src = hero.video;
+      video.setAttribute("poster", hero.video.replace(/\/[^/]+$/, "/poster.jpg"));
+      videoWrap.style.display = "block";
+    } else {
+      videoWrap.style.display = "none";
+    }
+  }
+}
+
+function renderWorks(works) {
+  if (!works) return;
+  document.getElementById("works-tag").textContent = t(works, "tag", "作品");
+  document.getElementById("works-title").textContent = t(works, "title", "近期项目");
+
+  var grid = document.getElementById("works-grid");
+  if (!grid || !works.items) return;
+
+  var icons = ["monitor", "layout", "panel", "target"];
+
+  grid.innerHTML = works.items
+    .map(function (item, i) {
+      var imgHTML = item.image
+        ? '<img src="' + escAttr(item.image) + '" alt="' + escAttr(t(item, "title")) + '" style="width:100%;height:100%;object-fit:cover;">'
+        : '<div class="work-placeholder">' + placeholderSVG(icons[i % icons.length]) + '</div>';
+      var tags = (item.tags || []).map(function (tg) {
+        return '<span class="tag">' + escHtml(tg) + '</span>';
+      }).join("");
+      return '<article class="work-card">' +
+        '<div class="work-image">' + imgHTML + '</div>' +
+        '<div class="work-info">' +
+        '<div class="work-tags">' + tags + '</div>' +
+        '<h3 class="work-title">' + escHtml(t(item, "title")) + '</h3>' +
+        '<p class="work-desc">' + escHtml(t(item, "description")) + '</p>' +
+        '</div></article>';
+    })
+    .join("");
+}
+
+function renderAbout(about) {
+  if (!about) return;
+  document.getElementById("about-tag").textContent = t(about, "tag", "关于");
+  document.getElementById("about-title").textContent = t(about, "title", "技能与经历");
+
+  var skillsEl = document.getElementById("skill-tags");
+  if (skillsEl && about.skills) {
+    skillsEl.innerHTML = about.skills
+      .map(function (s) {
+        return '<span class="skill-tag">' + escHtml(typeof s === "string" ? s : t(s, "name", s)) + '</span>';
+      })
+      .join("");
   }
 
-  // 拉环
+  var timelineEl = document.getElementById("timeline");
+  if (timelineEl && about.experience) {
+    timelineEl.innerHTML = about.experience
+      .map(function (exp) {
+        return '<li class="timeline-item">' +
+          '<span class="timeline-dot"></span>' +
+          '<div class="timeline-content">' +
+          '<span class="timeline-date">' + escHtml(t(exp, "date")) + '</span>' +
+          '<h4 class="timeline-title">' + escHtml(t(exp, "title")) + '</h4>' +
+          '<p class="timeline-desc">' + escHtml(t(exp, "description")) + '</p>' +
+          '</div></li>';
+      })
+      .join("");
+  }
+}
+
+function renderContact(contact) {
+  if (!contact) return;
+  document.getElementById("contact-tag").textContent = t(contact, "tag", "联系");
+  document.getElementById("contact-title").textContent = t(contact, "title", "保持联系");
+  document.getElementById("contact-text").innerHTML = t(contact, "text", "");
+
+  var linksEl = document.getElementById("contact-links");
+  if (!linksEl || !contact.links) return;
+
+  linksEl.innerHTML = contact.links
+    .map(function (link) {
+      var icon = iconSVG(link.icon);
+      var isExt = link.href && (link.href.indexOf("http") === 0 || link.href.indexOf("//") === 0);
+      return '<a href="' + escAttr(link.href) + '" class="contact-link"' +
+        (isExt ? ' target="_blank" rel="noopener"' : "") + '>' +
+        '<span class="contact-icon">' + icon + '</span>' +
+        escHtml(t(link, "label")) + '</a>';
+    })
+    .join("");
+}
+
+/* ==========================================
+   拉环装置
+   ========================================== */
+
+function setupPullTab() {
   var tab = document.createElement("div");
   tab.className = "lang-tab";
   tab.id = "lang-tab";
-  tab.textContent = currentLang === "zh" ? "EN" : "\u4e2d";
-  tab.addEventListener("click", switchLang);
+  tab.title = currentLang === "zh" ? "Switch to English" : "切换为中文";
+  updatePullTabLabel();
+  tab.addEventListener("click", switchLanguage);
+  tab.addEventListener("mouseenter", function () { tab.classList.add("lang-tab-hover"); });
+  tab.addEventListener("mouseleave", function () { tab.classList.remove("lang-tab-hover"); });
   document.body.appendChild(tab);
+}
 
-  // 交互
-  var els = document.querySelectorAll(".work-card, .about-block, .contact-content, .section-header, .timeline-item, .skill-tag");
-  var observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); }
-    });
-  }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
-  els.forEach(function (el) { el.classList.add("animate"); observer.observe(el); });
+function updatePullTabLabel() {
+  var tab = document.getElementById("lang-tab");
+  if (!tab) return;
+  tab.textContent = currentLang === "zh" ? "EN" : "中";
+  tab.title = currentLang === "zh" ? "Switch to English" : "切换为中文";
+}
 
-  var nav = document.getElementById("nav"), ticking = false;
+/* ==========================================
+   SVG 图标
+   ========================================== */
+
+function placeholderSVG(type) {
+  var icons = {
+    monitor: '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+    layout: '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="12" cy="12" r="2"/><path d="M12 6v2M12 16v2M6 12h2M16 12h2"/></svg>',
+    panel: '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
+    target: '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>',
+  };
+  return icons[type] || icons.monitor;
+}
+
+function iconSVG(type) {
+  var icons = {
+    email: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/></svg>',
+    github: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>',
+  };
+  return icons[type] || icons.email;
+}
+
+/* ==========================================
+   HTML 转义
+   ========================================== */
+
+function escHtml(str) {
+  if (!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function escAttr(str) {
+  if (!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/* ==========================================
+   滚动动画
+   ========================================== */
+
+function setupScrollAnimations() {
+  var elements = document.querySelectorAll(
+    ".work-card, .about-block, .contact-content, .section-header, .timeline-item, .skill-tag"
+  );
+  var observer = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+  );
+  elements.forEach(function (el) {
+    el.classList.add("animate");
+    observer.observe(el);
+  });
+}
+
+/* ==========================================
+   导航栏滚动效果
+   ========================================== */
+
+function setupNavScroll() {
+  var nav = document.getElementById("nav");
+  var ticking = false;
   window.addEventListener("scroll", function () {
-    if (!ticking) { requestAnimationFrame(function () { nav.classList.toggle("scrolled", window.scrollY > 60); ticking = false; }); ticking = true; }
+    if (!ticking) {
+      requestAnimationFrame(function () {
+        nav.classList.toggle("scrolled", window.scrollY > 60);
+        ticking = false;
+      });
+      ticking = true;
+    }
   });
+}
 
-  var toggle = document.getElementById("nav-toggle"), links = document.getElementById("nav-links");
-  if (toggle && links) {
-    toggle.addEventListener("click", function () { links.classList.toggle("active"); });
-    links.addEventListener("click", function (e) { if (e.target.tagName === "A") links.classList.remove("active"); });
-    document.addEventListener("click", function (e) { if (!toggle.contains(e.target) && !links.contains(e.target)) links.classList.remove("active"); });
-  }
+/* ==========================================
+   移动端菜单
+   ========================================== */
 
+function setupMobileMenu() {
+  var toggle = document.getElementById("nav-toggle");
+  var links = document.getElementById("nav-links");
+  if (!toggle || !links) return;
+  toggle.addEventListener("click", function () { links.classList.toggle("active"); });
+  links.addEventListener("click", function (e) {
+    if (e.target.tagName === "A") links.classList.remove("active");
+  });
   document.addEventListener("click", function (e) {
-    var a = e.target.closest('a[href^="#"]');
-    if (!a) return; var href = a.getAttribute("href");
-    if (!href || href === "#") return; var target = document.querySelector(href);
-    if (!target) return; e.preventDefault();
-    var navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-height")) || 64;
-    window.scrollTo({ top: target.offsetTop - navH - 16, behavior: "smooth" });
+    if (!toggle.contains(e.target) && !links.contains(e.target)) {
+      links.classList.remove("active");
+    }
   });
-})();
-  </script>
+}
+
+/* ==========================================
+   平滑滚动
+   ========================================== */
+
+function setupSmoothScroll() {
+  document.addEventListener("click", function (e) {
+    var anchor = e.target.closest('a[href^="#"]');
+    if (!anchor) return;
+    var href = anchor.getAttribute("href");
+    if (!href || href === "#") return;
+    var target = document.querySelector(href);
+    if (!target) return;
+    e.preventDefault();
+    var navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-height")) || 64;
+    window.scrollTo({ top: target.offsetTop - navHeight - 16, behavior: "smooth" });
+  });
+}
+
+/* ==========================================
+   启动
+   ========================================== */
+
+document.addEventListener("DOMContentLoaded", init);
+
+</script>
 </body>
 </html>

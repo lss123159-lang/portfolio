@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理面板 - Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="topbar-title">Portfolio 管理面板</span>
+    <div class="topbar-actions">
+      <span class="status" id="auth-status"></span>
+      <span class="status" id="status"></span>
+      <button class="btn" id="lang-toggle-btn">中</button>
+      <button class="btn" id="revert-btn">撤回修改</button>
+      <button class="btn" id="preview-btn">预览网站</button>
+      <button class="btn btn-primary" id="save-btn">保存更改</button>
+      <button class="btn btn-primary" id="deploy-btn">部署上线</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    </aside>
+    <div class="content" id="content"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 管理员登录遮罩 -->
+  <div class="login-overlay" id="login-overlay">
+    <div class="login-box">
+      <h2>管理员验证</h2>
+      <p>输入 ADMIN_TOKEN 以编辑网站内容</p>
+      <input type="password" class="field-input" id="login-token" placeholder="粘贴 token...">
+      <button class="btn btn-primary" id="login-btn" style="margin-top:12px;">验证</button>
+      <p class="login-error" id="login-error"></p>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

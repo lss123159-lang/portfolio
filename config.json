@@ -3,7 +3,12 @@
   "nav": {
     "logo": ""
   },
-  "hero": {},
+  "hero": {
+    "greeting": "你好，我是",
+    "name": "你的名字",
+    "videoEnabled": true,
+    "video": "images/hero-bg.mp4"
+  },
   "works": {},
   "about": {},
   "contact": {}

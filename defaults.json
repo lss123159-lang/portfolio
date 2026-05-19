@@ -18,9 +18,9 @@
   "nav": {
     "logo": "K",
     "links": [
-      { "label": "作品", "href": "#works" },
-      { "label": "关于", "href": "#about" },
-      { "label": "联系", "href": "#contact" }
+      { "id": "nav-works", "label": "作品", "href": "#works" },
+      { "id": "nav-about", "label": "关于", "href": "#about" },
+      { "id": "nav-contact", "label": "联系", "href": "#contact" }
     ]
   },
   "hero": {
@@ -36,24 +36,28 @@
     "title": "近期项目",
     "items": [
       {
+        "id": "work-1",
         "tags": ["Product Design", "Branding"],
         "title": "项目名称一",
         "description": "从零到一的产品设计案例，涵盖用户研究、交互原型与视觉设计。",
         "image": ""
       },
       {
+        "id": "work-2",
         "tags": ["Frontend", "React"],
         "title": "项目名称二",
         "description": "一个注重细节和交互体验的前端实现，追求像素级还原。",
         "image": ""
       },
       {
+        "id": "work-3",
         "tags": ["UI/UX", "Design System"],
         "title": "项目名称三",
         "description": "一套完整的设计系统，统一品牌语言，提升团队协作效率。",
         "image": ""
       },
       {
+        "id": "work-4",
         "tags": ["Full-stack", "TypeScript"],
         "title": "项目名称四",
         "description": "全栈应用实践，从数据库设计到前端交互的全流程探索。",
@@ -71,16 +75,19 @@
     ],
     "experience": [
       {
+        "id": "exp-1",
         "date": "2024 — 至今",
         "title": "高级产品设计师",
         "description": "某科技公司 · 负责核心产品线的设计策略与执行"
       },
       {
+        "id": "exp-2",
         "date": "2021 — 2024",
         "title": "前端开发工程师",
         "description": "某互联网公司 · 负责 B 端产品的架构与开发"
       },
       {
+        "id": "exp-3",
         "date": "2017 — 2021",
         "title": "设计专业 · 本科",
         "description": "某大学 · 数字媒体艺术 / 交互设计方向"
@@ -92,8 +99,8 @@
     "title": "保持联系",
     "text": "如果你对我的作品感兴趣，或者想一起合作，<br>欢迎随时联系我。",
     "links": [
-      { "label": "yourname@example.com", "href": "mailto:yourname@example.com", "icon": "email" },
-      { "label": "GitHub", "href": "https://github.com", "icon": "github" }
+      { "id": "contact-email", "label": "yourname@example.com", "href": "mailto:yourname@example.com", "icon": "email" },
+      { "id": "contact-github", "label": "GitHub", "href": "https://github.com", "icon": "github" }
     ]
   }
 }

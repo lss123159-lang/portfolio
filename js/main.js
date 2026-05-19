@@ -1,59 +1,123 @@
 /**
- * 全局状态
+ * js/main.js — 前台渲染引擎（开发模式 + 静态模式通用）
+ *
+ * 开发模式：fetch /api/defaults + /api/config，合并后渲染
+ * 静态模式：读取 window.__CONFIG__，直接渲染（build.js 生成）
  */
+
 let config = null;
 let defaults = null;
 let currentLang = "zh";
 
-/**
- * 深合并：config 覆盖 defaults
- */
+/* ==========================================
+   深度合并（数组按 id 匹配）
+   ========================================== */
+
 function deepMerge(def, cfg) {
   if (!cfg || typeof cfg !== "object") return def;
   if (!def || typeof def !== "object") return cfg;
+
   if (Array.isArray(def) && Array.isArray(cfg)) {
-    // 数组按索引逐个合并
-    return cfg.map((item, i) => deepMerge(def[i] || {}, item));
+    // 数组中有 id 字段 → 按 id 匹配合并
+    if (cfg.length > 0 && cfg[0] && typeof cfg[0] === "object" && cfg[0].id) {
+      return mergeArraysById(def, cfg);
+    }
+    // 无 id 的数组（如 skills）→ 用 config 覆盖
+    return cfg.length ? cfg : def;
   }
-  const result = {};
-  for (const key of Object.keys(def)) {
-    if (cfg[key] !== undefined && cfg[key] !== "" && cfg[key] !== null) {
-      result[key] = deepMerge(def[key], cfg[key]);
-    } else {
-      result[key] = def[key];
+
+  var result = {};
+  for (var key in def) {
+    if (def.hasOwnProperty(key)) {
+      if (cfg[key] !== undefined && cfg[key] !== "" && cfg[key] !== null) {
+        result[key] = deepMerge(def[key], cfg[key]);
+      } else {
+        result[key] = def[key];
+      }
     }
   }
-  // 保留 config 中有而 defaults 中没有的字段
-  for (const key of Object.keys(cfg)) {
-    if (!(key in def)) result[key] = cfg[key];
+  for (var k in cfg) {
+    if (cfg.hasOwnProperty(k) && !(k in def)) {
+      result[k] = cfg[k];
+    }
   }
   return result;
 }
 
-/**
- * 双语文本辅助：obj[key] 是中文，obj[key_en] 是英文
- */
+function mergeArraysById(def, cfg) {
+  var result = [];
+  var defMap = {};
+  def.forEach(function (item) {
+    if (item && item.id) defMap[item.id] = item;
+  });
+
+  // 按 defaults 顺序处理
+  def.forEach(function (item) {
+    if (!item || !item.id) { result.push(item); return; }
+    var cfgItem = null;
+    for (var i = 0; i < cfg.length; i++) {
+      if (cfg[i] && cfg[i].id === item.id) { cfgItem = cfg[i]; break; }
+    }
+    if (cfgItem) {
+      if (cfgItem._delete) return; // 标记删除
+      result.push(deepMerge(item, cfgItem));
+    } else {
+      result.push(item);
+    }
+  });
+
+  // config 中新增的项（id 不在 defaults 中的）追加到末尾
+  cfg.forEach(function (item) {
+    if (!item || !item.id || item._delete) return;
+    if (!defMap[item.id]) {
+      result.push(item);
+    }
+  });
+
+  return result;
+}
+
+/* ==========================================
+   双语文本辅助
+   ========================================== */
+
 function t(obj, key, fallback) {
   if (!obj) return fallback || "";
   if (currentLang === "en" && obj[key + "_en"]) return obj[key + "_en"];
   return obj[key] || fallback || "";
 }
 
-/**
- * 加载配置并渲染页面
- */
+/* ==========================================
+   初始化
+   ========================================== */
+
 async function init() {
   try {
-    const [resDef, resCfg] = await Promise.all([
+    // 静态模式：build.js 已嵌入 window.__CONFIG__
+    if (window.__CONFIG__) {
+      config = window.__CONFIG__;
+      var saved = localStorage.getItem("lang");
+      if (saved === "en") currentLang = "en";
+      applyTheme(config.theme);
+      renderAll();
+      setupPullTab();
+      setupScrollAnimations();
+      setupNavScroll();
+      setupMobileMenu();
+      setupSmoothScroll();
+      return;
+    }
+
+    // 开发模式：从 API 获取
+    var results = await Promise.all([
       fetch("/api/defaults"),
       fetch("/api/config"),
     ]);
-    defaults = await resDef.json();
-    const userCfg = await resCfg.json();
+    defaults = await results[0].json();
+    var userCfg = await results[1].json();
     config = deepMerge(defaults, userCfg);
 
-    // 从 localStorage 恢复语言偏好
-    const saved = localStorage.getItem("lang");
+    var saved = localStorage.getItem("lang");
     if (saved === "en") currentLang = "en";
 
     applyTheme(config.theme);
@@ -65,15 +129,15 @@ async function init() {
     setupSmoothScroll();
   } catch (err) {
     console.error("无法加载配置:", err);
-    const hero = document.getElementById("hero");
+    var hero = document.getElementById("hero");
     if (hero) {
-      hero.innerHTML = `
-        <div class="hero-content" style="text-align:center;">
-          <h1 class="hero-title">请通过服务器访问</h1>
-          <p class="hero-sub" style="margin-bottom:20px;">在终端运行以下命令启动服务器：</p>
-          <p style="font-size:16px;background:var(--color-accent-soft);display:inline-block;padding:12px 24px;border-radius:8px;font-family:monospace;margin-bottom:24px;">npm start</p>
-          <p class="hero-desc">然后访问 <a href="http://localhost:3000" style="color:var(--color-accent);text-decoration:underline;">http://localhost:3000</a></p>
-        </div>`;
+      hero.innerHTML =
+        '<div class="hero-content" style="text-align:center;">' +
+        '<h1 class="hero-title">请通过服务器访问</h1>' +
+        '<p class="hero-sub" style="margin-bottom:20px;">在终端运行以下命令启动服务器：</p>' +
+        '<p style="font-size:16px;background:var(--color-accent-soft);display:inline-block;padding:12px 24px;border-radius:8px;font-family:monospace;margin-bottom:24px;">npm start</p>' +
+        '<p class="hero-desc">然后访问 <a href="http://localhost:3000" style="color:var(--color-accent);text-decoration:underline;">http://localhost:3000</a></p>' +
+        '</div>';
     }
   }
 }
@@ -99,12 +163,10 @@ function switchLanguage() {
   currentLang = currentLang === "zh" ? "en" : "zh";
   localStorage.setItem("lang", currentLang);
   updatePullTabLabel();
-
-  // 重新渲染所有文字
   renderAll();
-
-  // 重新初始化滚动动画
-  document.querySelectorAll(".animate.visible").forEach((el) => el.classList.remove("animate", "visible"));
+  document.querySelectorAll(".animate.visible").forEach(function (el) {
+    el.classList.remove("animate", "visible");
+  });
   setupScrollAnimations();
 }
 
@@ -114,8 +176,8 @@ function switchLanguage() {
 
 function applyTheme(theme) {
   if (!theme) return;
-  const root = document.documentElement;
-  const map = {
+  var root = document.documentElement;
+  var map = {
     bg: "--color-bg",
     surface: "--color-surface",
     text: "--color-text",
@@ -126,60 +188,57 @@ function applyTheme(theme) {
     accent: "--color-accent",
     accentSoft: "--color-accent-soft",
   };
-  for (const [key, cssVar] of Object.entries(map)) {
-    if (theme[key]) root.style.setProperty(cssVar, theme[key]);
+  for (var key in map) {
+    if (theme[key]) root.style.setProperty(map[key], theme[key]);
   }
 }
 
 /* ==========================================
-   各区块渲染（全部使用 t() 取双语文本）
+   各区块渲染
    ========================================== */
 
 function renderSite(site) {
   if (!site) return;
   document.title = t(site, "title", "Portfolio");
-  const meta = document.querySelector('meta[name="description"]');
+  var meta = document.querySelector('meta[name="description"]');
   if (meta) meta.content = t(site, "description", "");
-  const footer = document.getElementById("footer-text");
-  if (footer) footer.textContent = `© ${new Date().getFullYear()}. ${t(site, "footer", "")}`;
+  var footer = document.getElementById("footer-text");
+  if (footer) footer.textContent = "© " + new Date().getFullYear() + ". " + t(site, "footer", "");
 }
 
 function renderNav(nav) {
   if (!nav) return;
-  const logo = document.getElementById("nav-logo");
+  var logo = document.getElementById("nav-logo");
   if (logo) logo.textContent = t(nav, "logo", "K");
-  const linksEl = document.getElementById("nav-links");
+  var linksEl = document.getElementById("nav-links");
   if (!linksEl || !nav.links) return;
   linksEl.innerHTML = nav.links
-    .map((l) => `<li><a href="${escAttr(l.href)}">${escHtml(t(l, "label"))}</a></li>`)
+    .map(function (l) {
+      return '<li><a href="' + escAttr(l.href) + '">' + escHtml(t(l, "label")) + '</a></li>';
+    })
     .join("");
 }
 
 function renderHero(hero) {
   if (!hero) return;
-  const titleEl = document.getElementById("hero-title");
-  const subEl = document.getElementById("hero-sub");
-  const descEl = document.getElementById("hero-desc");
+  var titleEl = document.getElementById("hero-title");
+  var subEl = document.getElementById("hero-sub");
+  var descEl = document.getElementById("hero-desc");
+  var greeting = t(hero, "greeting", "你好，我是");
+  var name = t(hero, "name", "你的名字");
+  var tagline = t(hero, "tagline", "创造简洁、好用、有温度的数字体验。");
+  var desc = t(hero, "description", '专注于<span class="text-accent">产品设计</span>与<span class="text-accent">前端开发</span>');
 
-  const greeting = t(hero, "greeting", "你好，我是");
-  const name = t(hero, "name", "你的名字");
-  const tagline = t(hero, "tagline", "创造简洁、好用、有温度的数字体验。");
-  const desc = t(hero, "description", '专注于<span class="text-accent">产品设计</span>与<span class="text-accent">前端开发</span>');
-
-  if (titleEl) {
-    titleEl.innerHTML = `${escHtml(greeting)} <span class="hero-name">${escHtml(name)}</span>`;
-  }
+  if (titleEl) titleEl.innerHTML = escHtml(greeting) + ' <span class="hero-name">' + escHtml(name) + '</span>';
   if (subEl) subEl.textContent = tagline;
   if (descEl) descEl.innerHTML = desc;
 
-  // 视频背景
-  const video = document.getElementById("hero-video");
-  const videoWrap = document.getElementById("hero-video-wrap");
+  var video = document.getElementById("hero-video");
+  var videoWrap = document.getElementById("hero-video-wrap");
   if (video && videoWrap) {
     if (hero.videoEnabled && hero.video) {
       video.src = hero.video;
-      const posterPath = hero.video.replace(/\/[^/]+$/, "/poster.jpg");
-      video.setAttribute("poster", posterPath);
+      video.setAttribute("poster", hero.video.replace(/\/[^/]+$/, "/poster.jpg"));
       videoWrap.style.display = "block";
     } else {
       videoWrap.style.display = "none";
@@ -192,30 +251,27 @@ function renderWorks(works) {
   document.getElementById("works-tag").textContent = t(works, "tag", "作品");
   document.getElementById("works-title").textContent = t(works, "title", "近期项目");
 
-  const grid = document.getElementById("works-grid");
+  var grid = document.getElementById("works-grid");
   if (!grid || !works.items) return;
 
-  const icons = ["monitor", "layout", "panel", "target"];
+  var icons = ["monitor", "layout", "panel", "target"];
 
   grid.innerHTML = works.items
-    .map(
-      (item, i) => `
-    <article class="work-card">
-      <div class="work-image">
-        ${item.image
-          ? `<img src="${escAttr(item.image)}" alt="${escAttr(t(item, "title"))}" style="width:100%;height:100%;object-fit:cover;">`
-          : `<div class="work-placeholder">${placeholderSVG(icons[i % icons.length])}</div>`
-        }
-      </div>
-      <div class="work-info">
-        <div class="work-tags">
-          ${(item.tags || []).map((tg) => `<span class="tag">${escHtml(tg)}</span>`).join("")}
-        </div>
-        <h3 class="work-title">${escHtml(t(item, "title"))}</h3>
-        <p class="work-desc">${escHtml(t(item, "description"))}</p>
-      </div>
-    </article>`
-    )
+    .map(function (item, i) {
+      var imgHTML = item.image
+        ? '<img src="' + escAttr(item.image) + '" alt="' + escAttr(t(item, "title")) + '" style="width:100%;height:100%;object-fit:cover;">'
+        : '<div class="work-placeholder">' + placeholderSVG(icons[i % icons.length]) + '</div>';
+      var tags = (item.tags || []).map(function (tg) {
+        return '<span class="tag">' + escHtml(tg) + '</span>';
+      }).join("");
+      return '<article class="work-card">' +
+        '<div class="work-image">' + imgHTML + '</div>' +
+        '<div class="work-info">' +
+        '<div class="work-tags">' + tags + '</div>' +
+        '<h3 class="work-title">' + escHtml(t(item, "title")) + '</h3>' +
+        '<p class="work-desc">' + escHtml(t(item, "description")) + '</p>' +
+        '</div></article>';
+    })
     .join("");
 }
 
@@ -224,27 +280,27 @@ function renderAbout(about) {
   document.getElementById("about-tag").textContent = t(about, "tag", "关于");
   document.getElementById("about-title").textContent = t(about, "title", "技能与经历");
 
-  const skillsEl = document.getElementById("skill-tags");
+  var skillsEl = document.getElementById("skill-tags");
   if (skillsEl && about.skills) {
     skillsEl.innerHTML = about.skills
-      .map((s) => `<span class="skill-tag">${escHtml(typeof s === "string" ? s : t(s, "name", s))}</span>`)
+      .map(function (s) {
+        return '<span class="skill-tag">' + escHtml(typeof s === "string" ? s : t(s, "name", s)) + '</span>';
+      })
       .join("");
   }
 
-  const timelineEl = document.getElementById("timeline");
+  var timelineEl = document.getElementById("timeline");
   if (timelineEl && about.experience) {
     timelineEl.innerHTML = about.experience
-      .map(
-        (exp) => `
-      <li class="timeline-item">
-        <span class="timeline-dot"></span>
-        <div class="timeline-content">
-          <span class="timeline-date">${escHtml(t(exp, "date"))}</span>
-          <h4 class="timeline-title">${escHtml(t(exp, "title"))}</h4>
-          <p class="timeline-desc">${escHtml(t(exp, "description"))}</p>
-        </div>
-      </li>`
-      )
+      .map(function (exp) {
+        return '<li class="timeline-item">' +
+          '<span class="timeline-dot"></span>' +
+          '<div class="timeline-content">' +
+          '<span class="timeline-date">' + escHtml(t(exp, "date")) + '</span>' +
+          '<h4 class="timeline-title">' + escHtml(t(exp, "title")) + '</h4>' +
+          '<p class="timeline-desc">' + escHtml(t(exp, "description")) + '</p>' +
+          '</div></li>';
+      })
       .join("");
   }
 }
@@ -255,19 +311,17 @@ function renderContact(contact) {
   document.getElementById("contact-title").textContent = t(contact, "title", "保持联系");
   document.getElementById("contact-text").innerHTML = t(contact, "text", "");
 
-  const linksEl = document.getElementById("contact-links");
+  var linksEl = document.getElementById("contact-links");
   if (!linksEl || !contact.links) return;
 
   linksEl.innerHTML = contact.links
-    .map((link) => {
-      const icon = iconSVG(link.icon);
-      const isExternal = link.href && (link.href.startsWith("http") || link.href.startsWith("//"));
-      return `
-      <a href="${escAttr(link.href)}" class="contact-link"
-         ${isExternal ? 'target="_blank" rel="noopener"' : ""}>
-        <span class="contact-icon">${icon}</span>
-        ${escHtml(t(link, "label"))}
-      </a>`;
+    .map(function (link) {
+      var icon = iconSVG(link.icon);
+      var isExt = link.href && (link.href.indexOf("http") === 0 || link.href.indexOf("//") === 0);
+      return '<a href="' + escAttr(link.href) + '" class="contact-link"' +
+        (isExt ? ' target="_blank" rel="noopener"' : "") + '>' +
+        '<span class="contact-icon">' + icon + '</span>' +
+        escHtml(t(link, "label")) + '</a>';
     })
     .join("");
 }
@@ -277,19 +331,19 @@ function renderContact(contact) {
    ========================================== */
 
 function setupPullTab() {
-  const tab = document.createElement("div");
+  var tab = document.createElement("div");
   tab.className = "lang-tab";
   tab.id = "lang-tab";
   tab.title = currentLang === "zh" ? "Switch to English" : "切换为中文";
   updatePullTabLabel();
   tab.addEventListener("click", switchLanguage);
-  tab.addEventListener("mouseenter", () => tab.classList.add("lang-tab-hover"));
-  tab.addEventListener("mouseleave", () => tab.classList.remove("lang-tab-hover"));
+  tab.addEventListener("mouseenter", function () { tab.classList.add("lang-tab-hover"); });
+  tab.addEventListener("mouseleave", function () { tab.classList.remove("lang-tab-hover"); });
   document.body.appendChild(tab);
 }
 
 function updatePullTabLabel() {
-  const tab = document.getElementById("lang-tab");
+  var tab = document.getElementById("lang-tab");
   if (!tab) return;
   tab.textContent = currentLang === "zh" ? "EN" : "中";
   tab.title = currentLang === "zh" ? "Switch to English" : "切换为中文";
@@ -300,7 +354,7 @@ function updatePullTabLabel() {
    ========================================== */
 
 function placeholderSVG(type) {
-  const icons = {
+  var icons = {
     monitor: '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
     layout: '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="12" cy="12" r="2"/><path d="M12 6v2M12 16v2M6 12h2M16 12h2"/></svg>',
     panel: '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
@@ -310,7 +364,7 @@ function placeholderSVG(type) {
 }
 
 function iconSVG(type) {
-  const icons = {
+  var icons = {
     email: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/></svg>',
     github: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>',
   };
@@ -336,12 +390,12 @@ function escAttr(str) {
    ========================================== */
 
 function setupScrollAnimations() {
-  const elements = document.querySelectorAll(
+  var elements = document.querySelectorAll(
     ".work-card, .about-block, .contact-content, .section-header, .timeline-item, .skill-tag"
   );
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
+  var observer = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add("visible");
           observer.unobserve(entry.target);
@@ -350,7 +404,7 @@ function setupScrollAnimations() {
     },
     { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
   );
-  elements.forEach((el) => {
+  elements.forEach(function (el) {
     el.classList.add("animate");
     observer.observe(el);
   });
@@ -361,11 +415,11 @@ function setupScrollAnimations() {
    ========================================== */
 
 function setupNavScroll() {
-  const nav = document.getElementById("nav");
-  let ticking = false;
-  window.addEventListener("scroll", () => {
+  var nav = document.getElementById("nav");
+  var ticking = false;
+  window.addEventListener("scroll", function () {
     if (!ticking) {
-      requestAnimationFrame(() => {
+      requestAnimationFrame(function () {
         nav.classList.toggle("scrolled", window.scrollY > 60);
         ticking = false;
       });
@@ -379,14 +433,14 @@ function setupNavScroll() {
    ========================================== */
 
 function setupMobileMenu() {
-  const toggle = document.getElementById("nav-toggle");
-  const links = document.getElementById("nav-links");
+  var toggle = document.getElementById("nav-toggle");
+  var links = document.getElementById("nav-links");
   if (!toggle || !links) return;
-  toggle.addEventListener("click", () => links.classList.toggle("active"));
-  links.addEventListener("click", (e) => {
+  toggle.addEventListener("click", function () { links.classList.toggle("active"); });
+  links.addEventListener("click", function (e) {
     if (e.target.tagName === "A") links.classList.remove("active");
   });
-  document.addEventListener("click", (e) => {
+  document.addEventListener("click", function (e) {
     if (!toggle.contains(e.target) && !links.contains(e.target)) {
       links.classList.remove("active");
     }
@@ -398,17 +452,15 @@ function setupMobileMenu() {
    ========================================== */
 
 function setupSmoothScroll() {
-  document.addEventListener("click", (e) => {
-    const anchor = e.target.closest('a[href^="#"]');
+  document.addEventListener("click", function (e) {
+    var anchor = e.target.closest('a[href^="#"]');
     if (!anchor) return;
-    const href = anchor.getAttribute("href");
+    var href = anchor.getAttribute("href");
     if (!href || href === "#") return;
-    const target = document.querySelector(href);
+    var target = document.querySelector(href);
     if (!target) return;
     e.preventDefault();
-    const navHeight = parseInt(
-      getComputedStyle(document.documentElement).getPropertyValue("--nav-height")
-    ) || 64;
+    var navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-height")) || 64;
     window.scrollTo({ top: target.offsetTop - navHeight - 16, behavior: "smooth" });
   });
 }
